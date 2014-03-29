@@ -7,11 +7,15 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
+import matt.oldui.ViewSwitchMenubar;
+
 //main tutorial used: previous, plus:
 // for the useful/horrifying gridbag layouts: http://docs.oracle.com/javase/tutorial/uiswing/layout/gridbag.html
 
 @SuppressWarnings("serial")
 public class UIWindow extends JFrame {
+	
+	ImportDeleteMenubar importDeleteMenubar;
 	JTabbedPane mainTabs;
 	JTabbedPane clerkTabs;
  	JPanel newBorrowerPanel;
@@ -31,6 +35,10 @@ public class UIWindow extends JFrame {
     public UIWindow() {
     	super("Main Class");
 
+    	//initialize the menu
+    	importDeleteMenubar = new ImportDeleteMenubar(this);
+        this.setJMenuBar(importDeleteMenubar);
+    	
     	// create the tab hierarchy. Leaf tabs are custom panels we define.
         mainTabs = new JTabbedPane(); getContentPane().add(mainTabs, BorderLayout.CENTER);
 	        clerkTabs = new JTabbedPane(); mainTabs.addTab("clerk", clerkTabs);

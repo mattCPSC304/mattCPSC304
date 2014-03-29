@@ -19,8 +19,6 @@ public class Database {
 	public Database() {
 		loadJDBCDriver();
 		connect("ora_t6e7", "a62970082");
-		importTables();
-		deleteTables();
 	}
 
 	public void loadJDBCDriver() {
@@ -51,7 +49,7 @@ public class Database {
 		}
 	}
 
-	private void importTables() {
+	public void importTables() {
 		String sql;
 		try {
 			Statement stmt = con.createStatement();
@@ -160,7 +158,7 @@ public class Database {
 		}
 	}
 
-	private void deleteTables() {
+	public void deleteTables() {
 		String sql;
 		try {
 			Statement stmt = con.createStatement();

@@ -201,10 +201,10 @@ public class CheckAccountPanel extends JPanel implements ActionListener { //TODO
 	}
 	
 	//handles the searches
-	public void actionPerformed(ActionEvent evt) {
+	public void actionPerformed(ActionEvent evt) { //TODO: hook this up to something proper
         String text = textField.getText();
         System.out.println("searching for: " + text);
-        Object[][] queryResults = Main.getDbAccess().getData(text);
+        Object[][] queryResults = Main.getDbAccess().getBooks(text);
         fineTable.setModel(new DefaultTableModel(queryResults, fineColumnNames));
         checkedOutTable.setModel(new DefaultTableModel(queryResults, checkedOutColumnNames));
         holdRequestTable.setModel(new DefaultTableModel(queryResults, holdRequestColumnNames));
