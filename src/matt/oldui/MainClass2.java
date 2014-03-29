@@ -1,4 +1,4 @@
-package matt.ui;
+package matt.oldui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+
 
 //main tutorial used: previous, plus tabs: http://docs.oracle.com/javase/tutorial/uiswing/layout/card.html
 //here I made a totally useless menu in ViewSwitchMenubar and also learned more about panels and how tabs work
