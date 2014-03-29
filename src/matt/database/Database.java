@@ -55,6 +55,7 @@ public class Database {
 		String sql;
 		try {
 			Statement stmt = con.createStatement();
+			
 			// BORROWER
 			// Borrower (bid, password, name, address, phone, emailAddress,
 			// sinOrStNo, expiryDate, type)
@@ -192,6 +193,8 @@ public class Database {
 			sql = "DROP TABLE FINE";
 			stmt.execute(sql);
 			System.out.println("Tables dropped.");
+			stmt.execute("DROP SEQUENCE fid_counter");
+			System.out.println("Sequence dropped");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
