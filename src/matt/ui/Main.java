@@ -2,6 +2,8 @@ package matt.ui;
 
 import javax.swing.SwingUtilities;
 
+import matt.database.DatabaseAccess;
+
 public class Main {
 	static private DatabaseAccess dbAccess;
 	static UIWindow window;

@@ -1,4 +1,4 @@
-package matt.ui;
+package matt.database;
 
 public class DatabaseAccess {
 	/**
