@@ -47,6 +47,16 @@ public class DatabaseAccess {
 		System.out.println("checking out books: " + bid + ", " + callNumbers);
 	}
 	
+	public void p_Return(String borid) {
+		db.processReturn((int) Integer.parseInt(borid));
+		System.out.println("returning books from borrowing id: " + borid);
+	}
+	
+	public void checkOverdue(){
+		db.checkOverdueItems();
+		System.out.println("checking overdue items");
+	}
+	
 	public Object[][] getBooks(String searchString) { //a simple search through the books for titles
     	List<Book> books = new ArrayList<Book>();
     	books = db.search(searchString, "title");
