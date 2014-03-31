@@ -690,8 +690,8 @@ public class Database {
 		try {
 			stmt = con.createStatement();
 			rs = stmt
-					.executeQuery("SELECT * FROM BORROWING, BORROWER, BORROWERYPE "
-							+ "WHERE BORROWING.bid=BORROWER.bid AND BORROWER.type=BORROWTYPE.type");
+					.executeQuery("SELECT * FROM BORROWING, BORROWER, BORROWERTYPE "
+							+ "WHERE BORROWING.bid=BORROWER.bid AND BORROWER.type=BORROWERTYPE.type");
 			while (rs.next()) {
 				if (rs.getDate("inDate").before(
 						new Date(javaDate.getTime()
