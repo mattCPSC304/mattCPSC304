@@ -9,6 +9,14 @@ public class DatabaseAccess {
 		db = new Database();
 	}
 	
+	public void initDb() {
+		db.importTables();
+	}
+	
+	public void purgeDb() {
+		db.deleteTables();
+	}
+	
 	/**
 	 * given a search string, returns a hardcoded two-dimensional array of objects.
 	 * y'know, for simulating queries.
@@ -23,6 +31,21 @@ public class DatabaseAccess {
     			};
     	return data;
     }
+	
+	@SuppressWarnings("deprecation")
+	public void addBorrower(String bid, String password, String name, //simple addition of borrower by fields
+			String address, String phone, String emailAddress,
+			String sinOrStNo, String expiryDateYear, String expiryDateMonth, String expiryDateDay, String type) {
+		java.sql.Date sqlExpiryDate = new java.sql.Date(Integer.parseInt(expiryDateYear), Integer.parseInt(expiryDateMonth), Integer.parseInt(expiryDateDay));
+		db.insertBorrower((int) Integer.parseInt(bid), password, name, address, phone, emailAddress,
+				sinOrStNo, sqlExpiryDate, type);
+		System.out.println("adding borrower: " + bid + ", " + password + ", " + name + ", " + address + ", " + phone + ", " + emailAddress + ", " + sinOrStNo + ", " + sqlExpiryDate.getYear() + ", " + sqlExpiryDate.getMonth() + ", " + sqlExpiryDate.getDay() + ", " + type); //TODO: REMOVE DEBUG CODE
+	}
+	
+	public void checkout(String bid, String callNumbers) {
+		db.checkoutItems((int) Integer.parseInt(bid), callNumbers.split(","));
+		System.out.println("checking out books: " + bid + ", " + callNumbers);
+	}
 	
 	public Object[][] getBooks(String searchString) { //a simple search through the books for titles
     	List<Book> books = new ArrayList<Book>();
@@ -49,11 +72,9 @@ public class DatabaseAccess {
 		System.out.println("book added: isbn: " + isbn); //TODO: REMOVE DEBUG CODE
 	}
 	
-	public void initDb() {
-		db.importTables();
+	public void addBookCopy(String callNumber, String copyNo, String status) { // a simple addition of a book copy by fields
+		db.insertBookCopy(callNumber, copyNo, status);
+		System.out.println("book copy added: callNumber: " + callNumber); //TODO: REMOVE DEBUG CODE
 	}
-	
-	public void purgeDb() {
-		db.deleteTables();
-	}
+
 }

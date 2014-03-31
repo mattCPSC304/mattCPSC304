@@ -14,6 +14,7 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 @SuppressWarnings("serial")
+// this is kind of three panels in one but whatever
 public class CheckAccountPanel extends JPanel implements ActionListener { //TODO: make this do more than just have a dumb println button
 	protected JLabel borrowerIdLabel;
 	protected JTextField textField;

@@ -5,11 +5,12 @@ import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import matt.ui.Main;
 
 public class Database {
 
@@ -18,7 +19,8 @@ public class Database {
 
 	public Database() {
 		loadJDBCDriver();
-		connect("ora_t6e7", "a62970082");
+		connect("ora_t6e7", "a62970082"); //Lu's
+		// connect("ora_o3s7", "a82417106"); // Matt's
 	}
 
 	public void loadJDBCDriver() {
@@ -53,7 +55,6 @@ public class Database {
 		String sql;
 		try {
 			Statement stmt = con.createStatement();
-			
 			// BORROWER
 			// Borrower (bid, password, name, address, phone, emailAddress,
 			// sinOrStNo, expiryDate, type)
@@ -67,7 +68,10 @@ public class Database {
 					+ " expiryDate date not NULL, "
 					+ " type VARCHAR(32) not NULL, " + " PRIMARY KEY ( bid ))";
 			stmt.executeUpdate(sql);
-			System.out.println("Table created.");
+			sql = "INSERT INTO BORROWER(bid, password, name, address, phone, emailAddress, sinOrStNo, expiryDate, type) " +
+					"VALUES (1,'1','1','1','1','1','1',TO_DATE('20130515', 'YYYYMMDD'),'1')";
+			stmt.executeUpdate(sql); //TODO: REMOVE DEBUG ENTRIES
+			System.out.println("Table BORROWER created.");
 
 			// BORROWERTYPE
 			// BorrowerType (type, bookTimeLimit)
@@ -75,7 +79,10 @@ public class Database {
 					+ " bookTimeLimit long not NULL, "
 					+ " PRIMARY KEY ( type ))";
 			stmt.executeUpdate(sql);
-			System.out.println("Table created.");
+			sql = "INSERT INTO BORROWERTYPE(bookTimeLimit, type) " +
+					"VALUES (10, '1')";
+			stmt.executeUpdate(sql); //TODO: ADD PROPER TYPES
+			System.out.println("Table BORROWERTYPE created.");
 
 			// BOOK
 			// Book (callNumber, isbn, title, mainAuthor, publisher, year )
@@ -87,7 +94,10 @@ public class Database {
 					+ " year VARCHAR(32) not NULL, "
 					+ " PRIMARY KEY ( callNumber ))";
 			stmt.executeUpdate(sql);
-			System.out.println("Table created.");
+			sql = "INSERT INTO BOOK(callNumber, isbn, title, mainAuthor, publisher, year) " +
+					"VALUES ('1','1','1','1','1','1')";
+			stmt.executeUpdate(sql); //TODO: REMOVE DEBUG ENTRIES
+			System.out.println("Table BOOK created.");
 
 			// HASAUTHOR
 			// HasAuthor (callNumber, name)
@@ -96,7 +106,7 @@ public class Database {
 					+ " name VARCHAR(32) not NULL, "
 					+ " PRIMARY KEY ( callNumber, name ))";
 			stmt.executeUpdate(sql);
-			System.out.println("Table created.");
+			System.out.println("Table HASAUTHOR created.");
 
 			// HASSUBJECT
 			// HasSubject (callNumber, subject)
@@ -105,7 +115,7 @@ public class Database {
 					+ " subject VARCHAR(32) not NULL, "
 					+ " PRIMARY KEY ( callNumber, subject ))";
 			stmt.executeUpdate(sql);
-			System.out.println("Table created.");
+			System.out.println("Table HASSUBJECT created.");
 
 			// BOOKCOPY
 			// BookCopy (callNumber, copyNo, status)
@@ -115,7 +125,10 @@ public class Database {
 					+ " status VARCHAR(32) not NULL, "
 					+ " PRIMARY KEY ( callNumber, copyNo ))";
 			stmt.executeUpdate(sql);
-			System.out.println("Table created.");
+			sql = "INSERT INTO BOOKCOPY(callNumber, copyNo, status) " +
+					"VALUES ('1','1','in')"; //TODO: REMOVE DEBUG ENTRIES
+			stmt.executeUpdate(sql);
+			System.out.println("Table BOOKCOPY created.");
 
 			// HOLDREQUEST
 			// HoldRequest(hid, bid, callNumber, issuedDate)
@@ -124,7 +137,10 @@ public class Database {
 					+ " callNumber VARCHAR(32) not NULL, "
 					+ " issueDate date not NULL, " + " PRIMARY KEY ( hid ))";
 			stmt.executeUpdate(sql);
-			System.out.println("Table created.");
+			System.out.println("Table HOLDREQUEST created.");
+
+			stmt.execute("CREATE SEQUENCE hid_counter");
+			System.out.println("hid_counter initiated");
 
 			// BORROWING
 			// Borrowing(borid, bid, callNumber, copyNo, outDate, inDate)
@@ -135,7 +151,7 @@ public class Database {
 					+ " outDate date not NULL, " + " inDate date not NULL, "
 					+ " PRIMARY KEY ( borid ))";
 			stmt.executeUpdate(sql);
-			System.out.println("Table created.");
+			System.out.println("Table BORROWING created.");
 
 			stmt.execute("CREATE SEQUENCE borid_counter");
 			displayMessage("borid_counter initiated");
@@ -148,7 +164,7 @@ public class Database {
 					+ " paidDate date not NULL, " + " borid INTEGER not NULL, "
 					+ " PRIMARY KEY ( fid ))";
 			stmt.executeUpdate(sql);
-			System.out.println("Table created.");
+			System.out.println("Table FINE created.");
 
 			stmt.execute("CREATE SEQUENCE fid_counter");
 			displayMessage("fid_counter initiated");
@@ -164,35 +180,51 @@ public class Database {
 			Statement stmt = con.createStatement();
 			sql = "DROP TABLE BORROWER";
 			stmt.execute(sql);
-			System.out.println("Tables dropped.");
+			System.out.println("Table BORROWER dropped.");
+			
 			sql = "DROP TABLE BORROWERTYPE";
 			stmt.execute(sql);
-			System.out.println("Tables dropped.");
+			System.out.println("Tables BORROWERTYPE dropped.");
+			
 			sql = "DROP TABLE BOOK";
 			stmt.execute(sql);
-			System.out.println("Tables dropped.");
+			System.out.println("Tables BOOK dropped.");
+			
 			sql = "DROP TABLE HASAUTHOR";
 			stmt.execute(sql);
-			System.out.println("Tables dropped.");
+			System.out.println("Tables HASAUTHOR dropped.");
+			
 			sql = "DROP TABLE HASSUBJECT";
 			stmt.execute(sql);
-			System.out.println("Tables dropped.");
+			System.out.println("Tables HASSUBJECT dropped.");
+			
 			sql = "DROP TABLE BOOKCOPY";
 			stmt.execute(sql);
-			System.out.println("Tables dropped.");
+			System.out.println("Tables BOOKCOPY dropped.");
+			
 			sql = "DROP TABLE HOLDREQUEST";
 			stmt.execute(sql);
-			System.out.println("Tables dropped.");
+			System.out.println("Tables HOLDREQUEST dropped.");
+			
+			sql = "DROP SEQUENCE hid_counter";
+			stmt.execute(sql);
+			System.out.println("Sequence hid_counter dropped");
+			
 			sql = "DROP TABLE BORROWING";
 			stmt.execute(sql);
-			System.out.println("Tables dropped.");
-			stmt.execute("DROP SEQUENCE borid_counter");
-			System.out.println("Sequence dropped");
+			System.out.println("Tables TABLE dropped.");
+			
+			sql = "DROP SEQUENCE borid_counter";
+			stmt.execute(sql);
+			System.out.println("Sequence borid_counter dropped");
+			
 			sql = "DROP TABLE FINE";
 			stmt.execute(sql);
-			System.out.println("Tables dropped.");
-			stmt.execute("DROP SEQUENCE fid_counter");
-			System.out.println("Sequence dropped");
+			System.out.println("Tables TABLE dropped.");
+			
+			sql = "DROP SEQUENCE fid_counter";
+			stmt.execute(sql);
+			System.out.println("Sequence fid_counter dropped");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -202,19 +234,20 @@ public class Database {
 	// Borrower (bid, password, name, address, phone, emailAddress, sinOrStNo,
 	// expiryDate, type)
 	public void insertBorrower(int bid, String password, String name,
-			String address, String phone, String sinOrStNo, Date expiryDate,
+			String address, String phone, String email, String sinOrStNo, Date expiryDate,
 			String type) {
 		PreparedStatement ps;
 		try {
-			ps = con.prepareStatement("INSERT INTO BORROWER VALUES (?,?,?,?,?,?,?,?)");
+			ps = con.prepareStatement("INSERT INTO BORROWER VALUES (?,?,?,?,?,?,?,?,?)");
 			ps.setInt(1, bid);
 			ps.setString(2, password);
 			ps.setString(3, name);
 			ps.setString(4, address);
 			ps.setString(5, phone);
-			ps.setString(6, sinOrStNo);
-			ps.setDate(7, expiryDate);
-			ps.setString(8, type);
+			ps.setString(6, email);
+			ps.setString(7, sinOrStNo);
+			ps.setDate(8, expiryDate);
+			ps.setString(9, type);
 			ps.executeUpdate();
 			con.commit();
 			ps.close();
@@ -429,77 +462,157 @@ public class Database {
 	// transactions performed by a clerk
 	// Add a new borrower -> see insertBorrower(...) and
 	// insertBorrowerType(...);
-	// Checkout items
-	public String[][] checkoutItems(int bid, String[] callNumbers) {
+	// The following method takes care of borrower type and booktime limit by
+	// adding a tuple into the BORROWERTYPE table
+	// otherwise we get no tuples when we join borrower and borrowertype
+	public void addBorrower(int bid, String password, String name,
+			String address, String phone, String sinOrStNo, Date expiryDate,
+			String type) {
+		PreparedStatement ps;
+		ResultSet rs;
+		try {
+			ps = con.prepareStatement("INSERT INTO BORROWER VALUES (?,?,?,?,?,?,?,?)");
+			ps.setInt(1, bid);
+			ps.setString(2, password);
+			ps.setString(3, name);
+			ps.setString(4, address);
+			ps.setString(5, phone);
+			ps.setString(6, sinOrStNo);
+			ps.setDate(7, expiryDate);
+			ps.setString(8, type);
+			ps.executeUpdate();
 
+			ps = con.prepareStatement("SELECT * FROM BORROWERTYPE WHERE type=?");
+			ps.setString(1, type);
+			rs = ps.executeQuery();
+			if (rs.next()) {// type exist in the table already
+				// do nothing
+			} else {
+				ps = con.prepareStatement("INSERT INTO BORROWERTYPE VALUES (?,?)");
+				ps.setString(1, type);
+				ps.setLong(2, 1000 * 60 * 60 * 24 * 7 * 2);// bookTimeLimit,
+															// measured in
+															// milliseconds,
+															// default 2 weeks.
+				ps.executeUpdate();
+			}
+			con.commit();
+			ps.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	// Checkout items
+	public List<Borrowing> checkoutItems(int bid, String[] callNumbers) {
+		List<Borrowing> checkoutList = new ArrayList<Borrowing>();
 		Statement stmt;
 		ResultSet rs;
 		PreparedStatement ps;
-		// String sql;
-		String[][] note = new String[callNumbers.length][2];
 		try {
 			stmt = con.createStatement();
+			ps = con.prepareStatement("NULL");// This statement needs to be
+											// initialized here to be closed at
+											// the end.
 			// check bid is valid
 			rs = stmt.executeQuery("SELECT * FROM BORROWER WHERE bid="
 					+ String.valueOf(bid));
-			// ResultSetMetaData rsmd = rs.getMetaData();
 			if (rs.next() == false) {
 				displayMessage("invalid bid.");
-				note[0][0] = "invalid bid.";
-				return note;
+				return checkoutList;
 			}
 			String borrowerType = rs.getString("type");
 			rs = stmt.executeQuery("SELECT * FROM BORROWERTYPE WHERE type="
 					+ borrowerType);
+			if (rs.next() == false) {
+				displayMessage("invalid borrower type.");
+				return checkoutList;
+			}
 			long bookTimeLimit = rs.getLong("bookTimeLimit");
 			for (int i = 0; i < callNumbers.length; i++) {
 				// check items available for borrowing
-				rs = stmt
-						.executeQuery("SELECT * FROM BOOKCOPY WHERE callNumber="
-								+ callNumbers[i] + " AND status=in");
+				rs = stmt.executeQuery("SELECT * FROM BOOKCOPY WHERE callNumber="
+								+ callNumbers[i] + " AND status='in'"); //TODO: REINSTATE BROKEN STATUS = IN CHECK
 				if (rs.next() == false) {
 					displayMessage("The callNumber " + callNumbers[i]
 							+ " does not have copies in database");
-					note[i][0] = callNumbers[i];
-					note[i][1] = "Item Not available";
+					Borrowing item = new Borrowing();
+					item.borid = -1;
+					item.bid = bid;
+					item.callNumber = callNumbers[i];
+					item.copyNo = "No such callNumber, or No more copies available";
 				} else {
 					// set bookCopy status to "out"
 					String copyNo = rs.getString("copyNo");
-					stmt.executeUpdate("UPDATE BOOKCOPY SET status=out WHERE callNumber="
+					stmt.executeUpdate("UPDATE BOOKCOPY SET status='out' WHERE callNumber="
 							+ callNumbers[i] + " AND copyNo=" + copyNo);
 					// create borrowing tuples
 					java.util.Date javaDate = new java.util.Date();
 					Date now = new Date(javaDate.getTime());
-					Date expiry = new Date(javaDate.getTime() + bookTimeLimit);
-					// insertBorrowing(getBorid(), bid, callNumbers[i], copyNo,
-					// now, expiry);
-					ps = con.prepareStatement("INSERT INTO BORROWING VALUES (borid_counter.nextval,?,?,?,?,?)");
+					Date dueDate = new Date(javaDate.getTime() + bookTimeLimit);
+					ps = con.prepareStatement("INSERT INTO BORROWING VALUES (borid_counter.nextval,?,?,?,?,?)",new String[]{"BORID"});
 					ps.setInt(1, bid);
 					ps.setString(2, callNumbers[i]);
 					ps.setString(3, copyNo);
 					ps.setDate(4, now);
-					ps.setDate(5, expiry);
+					ps.setDate(5, new Date(0));// inDate is unknown yet, so set
+												// it to 0;
+					
 					ps.executeUpdate();
-					// rs=stmt.executeQuery("SELECT borid FROM ");
+					rs = ps.getGeneratedKeys();
+				    rs.next();
+					
+					Borrowing item = new Borrowing();
+					item.borid = rs.getInt(1);
+					item.bid = bid;
+					item.callNumber = callNumbers[i];
+					item.copyNo = copyNo;
+					item.outDate = now;
+					item.inDate = new Date(0);
+					item.dueDate = dueDate;
+					checkoutList.add(item);
 					// prepare note
-					note[i][0] = callNumbers[i];
-					note[i][1] = expiry.toString();
 				}
 			}
+			con.commit();
+			rs.close();
+			ps.close();
+			stmt.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		// return a note with items and due date
-		return note;
+		return checkoutList;
 	}
 
-	public void processReturn(int bid, String callNumber, String copyNo,
-			int borid) {
+	/*
+	 * Process a return. Return -1 if on time. Return -2 if borid is invalid.
+	 * Return fid of a newly created fine if item is overdue.
+	 */
+	public int processReturn(int borid) {
+		int fid = -1;
 		Statement stmt;
 		ResultSet rs;
 		PreparedStatement ps;
+		String callNumber;
+		String copyNo;
+		java.util.Date javaDate = new java.util.Date();
+		Date now = new Date(javaDate.getTime());
 		try {
 			stmt = con.createStatement();
+			// get callNumber and copyNo first
+			rs = stmt.executeQuery("SELECT * FROM BORROWING WHERE borid="
+					+ String.valueOf(borid));
+			if (!rs.next()) {
+				displayMessage("Supplied borid does not exist in the database");
+				return -2;
+			}
+			callNumber = rs.getString("callNumber");
+			copyNo = rs.getString("copyNo");
+			// set inDate = now
+			ps = con.prepareStatement("UPDATE BORROWING SET inDate=? WHERE borid=?");
+			ps.setDate(1, now);
+			ps.setInt(2, borid);
 			// set BOOKCOPY.status="in"
 			ps = con.prepareStatement("UPDATE BOOKCOPY SET status=in WHERE callNumber=? AND copyNo=?");
 			ps.setString(1, callNumber);
@@ -508,21 +621,26 @@ public class Database {
 			// check to see if the item is overdue. If overdue, Insert a fine
 			// tuple.
 			// rs=stmt.executeQuery("SELECT * FROM BORROWING where borid=");
-			ps = con.prepareStatement("SELECT * FROM BORROWING where borid=?");
+			ps = con.prepareStatement("SELECT * FROM BORROWING, BORROWER, BORROWERTYPE where borid=? AND "
+					+ "BORROWING.bid=BORROWER.bid AND BORROWER.type=BORROWERTYPE.type");
 			ps.setInt(1, borid);
 			rs = ps.executeQuery();
 			rs.next();
-			if (rs.getDate("exipry").before(
-					new Date(new java.util.Date().getTime()))) {
+			if (rs.getDate("outDate").before(
+					new Date(new java.util.Date().getTime()
+							- rs.getLong("bookTimeLimit")))) {
 				// item is overdue
-				ps = con.prepareStatement("INSERT INTO FINE VALUES (fid_counter.nextval,?,?,?,?");
+				ps = con.prepareStatement("INSERT INTO FINE VALUES (fid_counter.nextval,?,?,?,? RETURNING fid");
 				ps.setString(1, "100");
-				java.util.Date javaDate = new java.util.Date();
-				Date now = new Date(javaDate.getTime());
+				// java.util.Date javaDate=new java.util.Date();
+				// Date now=new Date(javaDate.getTime());
 				ps.setDate(2, now);
 				ps.setDate(3, new Date(0));
 				ps.setInt(4, borid);
 				ps.executeUpdate();
+				rs = ps.getResultSet();
+				rs.next();
+				fid = rs.getInt(1);
 			}
 			// check for holdRequest. If the item is requested, set status to
 			// "onHold".
@@ -532,6 +650,10 @@ public class Database {
 			if (rs.next()) {
 				int bid_waiter = rs.getInt("bid");
 				// TODO: notify the guy that his reservation is ready
+				displayMessage("Hey yo your bid is "
+						+ String.valueOf(bid_waiter)
+						+ " and you have reserved an item with call number "
+						+ callNumber + " that just came in!");
 			}
 			stmt.close();
 			ps.close();
@@ -540,23 +662,35 @@ public class Database {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return fid;
 	}
 
-	public List<String> checkOverdueItems() {
-		List<String> overdue = new ArrayList<String>();
+	public List<Borrowing> checkOverdueItems() {
+		List<Borrowing> overdue = new ArrayList<Borrowing>();
 		java.util.Date javaDate = new java.util.Date();
-		Date now = new Date(javaDate.getTime());
+		// Date now=new Date(javaDate.getTime());
 		Statement stmt;
 		ResultSet rs;
-		PreparedStatement ps;
+		// PreparedStatement ps;
 		try {
 			stmt = con.createStatement();
-			rs = stmt.executeQuery("SELECT * FROM BORROWING");
+			rs = stmt
+					.executeQuery("SELECT * FROM BORROWING, BORROWER, BORROWERYPE "
+							+ "WHERE BORROWING.bid=BORROWER.bid AND BORROWER.type=BORROWTYPE.type");
 			while (rs.next()) {
-				if (rs.getDate("inDate").before(now)) {
-					overdue.add("bid: " + String.valueOf(rs.getInt("bid")));
-					overdue.add("callNumber: " + rs.getString("callNumber"));
-					overdue.add("copyNo: " + rs.getString("copyNo"));
+				if (rs.getDate("inDate").before(
+						new Date(javaDate.getTime()
+								- rs.getLong("bookTimeLimit")))) {
+					Borrowing item = new Borrowing();
+					item.bid = rs.getInt("bid");
+					item.borid = rs.getInt("borid");
+					item.callNumber = rs.getString("callNumber");
+					item.copyNo = rs.getString("copyNo");
+					item.outDate = rs.getDate("outDate");
+					item.inDate = rs.getDate("inDate");
+					item.dueDate = new Date(rs.getDate("outDate").getTime()
+							+ rs.getLong("bookTimeLimit"));
+					overdue.add(item);
 				}
 			}
 		} catch (SQLException e) {
@@ -589,6 +723,260 @@ public class Database {
 		return books;
 	}
 
+	// Note that the returned object does not have overDue correctly
+	// implemented.
+	public AccountInfo checkAccount(int bid) {
+		Statement stmt;
+		ResultSet rs;
+		Statement stmt1;
+		ResultSet rs1;
+		// List<BorrowedBook> borrowedBooks= new ArrayList<BorrowedBook>();
+		AccountInfo accountInfo = new AccountInfo();
+		try {
+			stmt = con.createStatement();
+			stmt1 = con.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM BORROWING WHERE bid=" + bid);
+			rs1 = stmt.executeQuery("SELECT * FROM BORROWING WHERE bid=" + bid);// This
+																				// line
+																				// is
+																				// only
+																				// needed
+																				// to
+																				// initialize
+																				// rs1
+																				// to
+																				// close
+																				// it.
+			// java.util.Date javaDate=new java.util.Date();
+			// Date now=new Date(javaDate.getTime());
+			while (rs.next()) {
+				if (rs.getDate("inDate") == new Date(0)) {
+					BorrowedBook book = new BorrowedBook();
+					String callNumber = rs.getString("callNumber");
+					rs1 = stmt1
+							.executeQuery("SELECT * FROM BOOK WHERE callNumber="
+									+ callNumber);
+					rs1.next();
+					book.callNumber = rs1.getString("callNumber");
+					book.isbn = rs1.getString("isbn");
+					book.mainAuthor = rs1.getString("mainAuthor");
+					book.publisher = rs1.getString("publisher");
+					book.title = rs1.getString("title");
+					book.year = rs1.getString("year");
+					book.borid = rs.getInt("borid");
+					book.copyNo = rs.getString("copyNo");
+					book.bid = bid;
+					accountInfo.borrowedBooks.add(book);
+				}
+			}
+			rs = stmt.executeQuery("SELECT * FROM FINE WHERE bid=" + bid);
+			while (rs.next()) {
+				if (rs.getDate("paidDate") == new Date(0)) {
+					Fine fine = new Fine();
+					fine.fid = rs.getInt("fid");
+					fine.amount = rs.getString("amount");
+					fine.issuedDate = rs.getDate("issuedDate");
+					fine.paidDate = rs.getDate("paidDate");
+					fine.borid = rs.getInt("borid");
+					accountInfo.fines.add(fine);
+				}
+			}
+			rs = stmt
+					.executeQuery("SELECT * FROM HOLDREQUEST WHERE bid=" + bid);
+			while (rs.next()) {
+				HoldRequest holdRequest = new HoldRequest();
+				holdRequest.hid = rs.getInt("hid");
+				holdRequest.bid = rs.getInt("bid");
+				holdRequest.callNumber = rs.getString("callNumber");
+				accountInfo.holdRequests.add(holdRequest);
+			}
+			// con.commit(); // no need to commit because not updating.
+			stmt.close();
+			stmt1.close();
+			rs.close();
+			rs1.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return accountInfo;
+	}
+
+	public HoldRequest placeHoldRequest(int bid, String callNumber,
+			Date issuedDate) {
+		HoldRequest holdRequest = new HoldRequest();
+		ResultSet rs;
+		PreparedStatement ps;
+		try {
+			ps = con.prepareStatement("INSERT INTO HOLDREQUEST VALUES (hid_counter.nextval,?,?,?) RETURNING hid");
+			ps.setInt(1, bid);
+			ps.setString(2, callNumber);
+			ps.setDate(3, issuedDate);
+			ps.executeUpdate();
+			rs = ps.getResultSet();
+			rs.next();
+			holdRequest.hid = rs.getInt(1);
+			holdRequest.bid = bid;
+			holdRequest.callNumber = callNumber;
+			holdRequest.issuedDate = issuedDate;
+			con.commit();
+			rs.close();
+			ps.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return holdRequest;
+	}
+
+	public Fine payFine(int fid) {
+		Fine fine = new Fine();
+		Statement stmt;
+		PreparedStatement ps;
+		ResultSet rs;
+		try {
+			stmt = con.createStatement();
+			ps = con.prepareStatement("UPDATE FINE SET paidDate = ? WHERE fid = ? ");
+			java.util.Date javaDate = new java.util.Date();
+			Date now = new Date(javaDate.getTime());
+			ps.setDate(1, now);
+			ps.setInt(2, fid);
+			rs = stmt.executeQuery("SELECT * FROM FINE WHERE fid = " + fid);
+			rs.next();
+			fine.fid = fid;
+			fine.amount = rs.getString("amount");
+			fine.issuedDate = rs.getDate("issuedDate");
+			fine.paidDate = rs.getDate("paidDate");
+			fine.borid = rs.getInt("borid");
+			con.commit();
+			stmt.close();
+			ps.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return fine;
+	}
+
+	// AddNewBook - > See InsertBook
+	public Book addBook(String callNumber, String isbn, String title,
+			String mainAuthor, String publisher, String year) {
+		Book book = new Book();
+		PreparedStatement ps;
+		try {
+			ps = con.prepareStatement("INSERT INTO BOOK VALUES (?,?,?,?,?,?)");
+			ps.setString(1, callNumber);
+			ps.setString(2, isbn);
+			ps.setString(3, title);
+			ps.setString(4, mainAuthor);
+			ps.setString(5, publisher);
+			ps.setString(6, year);
+			ps.executeUpdate();
+			con.commit();
+			ps.close();
+			book.callNumber = callNumber;
+			book.isbn = isbn;
+			book.title = title;
+			book.mainAuthor = mainAuthor;
+			book.publisher = publisher;
+			book.year = year;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return book;
+	}
+
+	// add a bookcopy and set status to be "in"
+	public BookCopy addBookCopy(String callNumber, String copyNo) {
+		BookCopy bookCopy = new BookCopy();
+		PreparedStatement ps;
+		try {
+			ps = con.prepareStatement("INSERT INTO BOOKCOPY VALUES (?,?,?)");
+			ps.setString(1, callNumber);
+			ps.setString(2, copyNo);
+			ps.setString(3, "in");
+			ps.executeUpdate();
+			con.commit();
+			ps.close();
+			bookCopy.callNumber = callNumber;
+			bookCopy.copyNo = copyNo;
+			bookCopy.status = "in";
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return bookCopy;
+	}
+
+	public List<BookReportItem> outBookReport() {
+		List<BookReportItem> report = new ArrayList<BookReportItem>();
+		PreparedStatement ps;
+		ResultSet rs;
+		java.util.Date javaDate = new java.util.Date();
+		Date now = new Date(javaDate.getTime());
+		try {
+			ps = con.prepareStatement("SELECT callNumber, copyNo, outDate, title, bookTimeLimit "
+					+ "FROM BOOK bk, BOOKCOPY bc, BORROWING br, BORROWER b, BORROWERTYPE bt "
+					+ "WHERE bk.callNumber=bc.callnumber AND bc.callNumber=br.callNumber AND "
+					+ "b.type=bt.type AND br.bid=b.bid "
+					+ "bc.status='out' "
+					+ "ORDER BY bk.callNumber");
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				BookReportItem book = new BookReportItem();
+				book.callNumber = rs.getString("callNumber");
+				book.copyNo = rs.getString("copyNo");
+				book.title = rs.getString("title");
+				book.subject = "not requested";
+				book.outDate = rs.getDate("outDate");
+				book.dueDate = new Date(rs.getDate("outDate").getTime()
+						+ rs.getLong("bookTimeLimit"));
+				if (now.after(book.dueDate)) {
+					book.overdue = true;
+				} else {
+					book.overdue = false;
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return report;
+	}
+
+	public List<BookReportItem> outBookReport(String subject) {
+		List<BookReportItem> report = new ArrayList<BookReportItem>();
+		PreparedStatement ps;
+		ResultSet rs;
+		java.util.Date javaDate = new java.util.Date();
+		Date now = new Date(javaDate.getTime());
+		try {
+			ps = con.prepareStatement("SELECT callNumber, copyNo, subject, outDate, title, bookTimeLimit "
+					+ "FROM BOOK bk, BOOKCOPY bc, BORROWING br, HASSUBJECT hs, BORROWER b, BORROWERTYPE bt "
+					+ "WHERE bk.callNumber=bc.callnumber AND bc.callNumber=br.callNumber AND "
+					+ "bc.callNumber=hs.callNumber AND b.type=bt.type AND br.bid=b.bid "
+					+ "bc.status='out' AND hs.subject=? "
+					+ "ORDER BY bk.callNumber");
+			ps.setString(1, subject);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				BookReportItem book = new BookReportItem();
+				book.callNumber = rs.getString("callNumber");
+				book.copyNo = rs.getString("copyNo");
+				book.title = rs.getString("title");
+				book.subject = rs.getString("subject");
+				book.outDate = rs.getDate("outDate");
+				book.dueDate = new Date(rs.getDate("outDate").getTime()
+						+ rs.getLong("bookTimeLimit"));
+				if (now.after(book.dueDate)) {
+					book.overdue = true;
+				} else {
+					book.overdue = false;
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return report;
+	}
+
 	// Borrower (bid, password, name, address, phone, emailAddress, sinOrStNo,
 	// expiryDate, type)
 	// BorrowerType (type, bookTimeLimit)
@@ -600,14 +988,10 @@ public class Database {
 	// Borrowing(borid, bid, callNumber, copyNo, outDate, inDate)
 	// Fine (fid, amount, issuedDate, paidDate, borid)
 
-	private int getBorid() {
-		borid++;
-		return borid;
-	}
-
 	// to be rewritten for GUI
 	public void displayMessage(String msg) {
 		System.out.println(msg);
+		Main.outputToConsole(msg);
 	}
 
 	public static void main(String args[]) {
