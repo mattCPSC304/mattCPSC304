@@ -59,7 +59,7 @@ public class CheckOverduePanel extends JPanel implements ActionListener{
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 3;
 		c.gridx = 0;
-		c.gridy = 2;
+		c.gridy = 0;
 		c.weightx = 1.0;
 		c.weighty = 0.0;
 		this.add(checkoverdueButton, c);
@@ -83,6 +83,6 @@ public class CheckOverduePanel extends JPanel implements ActionListener{
 	
 	public void actionPerformed(ActionEvent evt) {
 		System.out.println("check overdue button pressed");
-		Main.getDbAccess().checkOverdue();
+		resultsTable.setModel(new DefaultTableModel(Main.getDbAccess().checkOverdue(), resultsColumnNames));
 	}
 }

@@ -47,7 +47,7 @@ public class DatabaseAccess {
 		System.out.println("checking out books: " + bid + ", " + callNumbers);
 	}
 	
-	public void p_Return(String borid) {
+	public void processReturn(String borid) {
 		db.processReturn((int) Integer.parseInt(borid));
 		System.out.println("returning books from borrowing id: " + borid);
 	}
@@ -56,7 +56,7 @@ public class DatabaseAccess {
 		List<Borrowing> overdue = new ArrayList<Borrowing>();
 		overdue = db.checkOverdueItems();
 		Object[][] data = new Object[overdue.size()][6];
-		System.out.println("checking overdue items");
+		System.out.println("checking overdue items"); //TODO: REMOVE DEBUG CODE
 		for (int i = 0; i < overdue.size(); i++) {
 			Object[] row = new Object[6];
 			Borrowing b = overdue.get(i);
@@ -66,6 +66,7 @@ public class DatabaseAccess {
 			row[3] = b.copyNo;
 			row[4] = b.outDate;
 			row[5] = b.inDate;
+			data[i] = row;
 		}
 		return data;
 	}

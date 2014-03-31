@@ -22,7 +22,7 @@ public class ReturnPanel extends JPanel implements ActionListener{
 		
 		///////////data fields///////////
 		// add text fields
-		boridLabel = new JLabel(" borrowing id:  ");
+		boridLabel = new JLabel(" borrower id:  ");
 		boridField = new JTextField(20);
 		boridField.addActionListener(this);
 		
@@ -49,7 +49,6 @@ public class ReturnPanel extends JPanel implements ActionListener{
 		c.weighty = 0.0;
 		this.add(boridField, c);
 		
-		
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 3;
 		c.gridx = 0;
@@ -62,6 +61,6 @@ public class ReturnPanel extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent evt) {
 		String borid = boridField.getText();
 		System.out.println("checking out books: " + borid);
-		Main.getDbAccess().p_Return(borid);
+		Main.getDbAccess().processReturn(borid);
 	}
 }

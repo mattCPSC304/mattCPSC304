@@ -20,8 +20,10 @@ public class Database {
 	public Database() {
 		loadJDBCDriver();
 		// connect("ora_t6e7", "a62970082"); //Lu's
-		// connect("ora_o3s7", "a82417106"); // Matt's
-		connect("ora_h7a8", "a29146115"); // Michael's
+		// connect("ora_o3s7", "a82417106"); //Matt's
+		// connect("ora_h7a8", "a29146115"); //Michael's
+		// connect(<ora_c#c#>, <a########>); //Alborz's //TODO: PUT YOUR INFO HERE ALBORZ
+		   connect(helpful remember: use your own database!);
 	}
 
 	public void loadJDBCDriver() {
@@ -680,7 +682,7 @@ public class Database {
 		return fid;
 	}
 
-	public List<Borrowing> checkOverdueItems() {
+	public List<Borrowing> checkOverdueItems() { //TODO: ONLY RETURN ITEMS THAT ARE OVERDUE AND OUT
 		List<Borrowing> overdue = new ArrayList<Borrowing>();
 		java.util.Date javaDate = new java.util.Date();
 		// Date now=new Date(javaDate.getTime());
@@ -689,23 +691,26 @@ public class Database {
 		// PreparedStatement ps;
 		try {
 			stmt = con.createStatement();
-			rs = stmt
-					.executeQuery("SELECT * FROM BORROWING, BORROWER, BORROWERTYPE "
+			rs = stmt.executeQuery("SELECT * FROM BORROWING, BORROWER, BORROWERTYPE "
 							+ "WHERE BORROWING.bid=BORROWER.bid AND BORROWER.type=BORROWERTYPE.type");
 			while (rs.next()) {
-				if (rs.getDate("inDate").before(
-						new Date(javaDate.getTime()
-								- rs.getLong("bookTimeLimit")))) {
+				long timeLimit = rs.getLong("bookTimeLimit");
+				Date outDate = rs.getDate("outDate");
+				Date inDate = rs.getDate("inDate");
+				Date dueDate = new Date(outDate.getTime() + timeLimit);
+				if (inDate.before(dueDate)) {
 					Borrowing item = new Borrowing();
 					item.bid = rs.getInt("bid");
 					item.borid = rs.getInt("borid");
 					item.callNumber = rs.getString("callNumber");
 					item.copyNo = rs.getString("copyNo");
-					item.outDate = rs.getDate("outDate");
-					item.inDate = rs.getDate("inDate");
-					item.dueDate = new Date(rs.getDate("outDate").getTime()
-							+ rs.getLong("bookTimeLimit"));
+					item.outDate = outDate;
+					item.inDate = inDate;
+					item.dueDate = dueDate;
 					overdue.add(item);
+					displayMessage("overdue: bid: " + rs.getInt("borid")); //TODO: REMOVE DEBUG PRINTLNS
+				} else {
+					displayMessage("not overdue: bid: " + rs.getInt("borid")); //TODO: REMOVE DEBUG PRINTLNS
 				}
 			}
 		} catch (SQLException e) {
