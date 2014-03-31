@@ -52,9 +52,22 @@ public class DatabaseAccess {
 		System.out.println("returning books from borrowing id: " + borid);
 	}
 	
-	public void checkOverdue(){
-		db.checkOverdueItems();
+	public Object[][] checkOverdue(){
+		List<Borrowing> overdue = new ArrayList<Borrowing>();
+		overdue = db.checkOverdueItems();
+		Object[][] data = new Object[overdue.size()][6];
 		System.out.println("checking overdue items");
+		for (int i = 0; i < overdue.size(); i++) {
+			Object[] row = new Object[6];
+			Borrowing b = overdue.get(i);
+			row[0] = b.borid;
+			row[1] = b.bid;
+			row[2] = b.callNumber;
+			row[3] = b.copyNo;
+			row[4] = b.outDate;
+			row[5] = b.inDate;
+		}
+		return data;
 	}
 	
 	public Object[][] getBooks(String searchString) { //a simple search through the books for titles

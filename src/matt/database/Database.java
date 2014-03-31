@@ -20,7 +20,8 @@ public class Database {
 	public Database() {
 		loadJDBCDriver();
 		// connect("ora_t6e7", "a62970082"); //Lu's
-		connect("ora_o3s7", "a82417106"); // Matt's
+		// connect("ora_o3s7", "a82417106"); // Matt's
+		connect("ora_h7a8", "a29146115"); // Michael's
 	}
 
 	public void loadJDBCDriver() {
