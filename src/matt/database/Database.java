@@ -19,8 +19,8 @@ public class Database {
 
 	public Database() {
 		loadJDBCDriver();
-		connect("ora_t6e7", "a62970082"); //Lu's
-		// connect("ora_o3s7", "a82417106"); // Matt's
+		// connect("ora_t6e7", "a62970082"); //Lu's
+		connect("ora_o3s7", "a82417106"); // Matt's
 	}
 
 	public void loadJDBCDriver() {
@@ -80,7 +80,8 @@ public class Database {
 					+ " PRIMARY KEY ( type ))";
 			stmt.executeUpdate(sql);
 			sql = "INSERT INTO BORROWERTYPE(bookTimeLimit, type) " +
-					"VALUES (10, '1')";
+					"VALUES (10, '1')"; // dates are in milliseconds since 1970. so 7 days in ms is
+										// 7 days * 24 hours/day * 60 minutes/hour * 60 seconds/minute * 1000ms/second = 604800000 //TODO: ADD THIS
 			stmt.executeUpdate(sql); //TODO: ADD PROPER TYPES
 			System.out.println("Table BORROWERTYPE created.");
 
@@ -532,7 +533,7 @@ public class Database {
 			for (int i = 0; i < callNumbers.length; i++) {
 				// check items available for borrowing
 				rs = stmt.executeQuery("SELECT * FROM BOOKCOPY WHERE callNumber="
-								+ callNumbers[i] + " AND status='in'"); //TODO: REINSTATE BROKEN STATUS = IN CHECK
+								+ callNumbers[i] + " AND status='in'");
 				if (rs.next() == false) {
 					displayMessage("The callNumber " + callNumbers[i]
 							+ " does not have copies in database");
@@ -572,6 +573,7 @@ public class Database {
 					item.dueDate = dueDate;
 					checkoutList.add(item);
 					// prepare note
+					displayMessage("borrower with id " + item.bid + " borrowed copy " + item.copyNo + " of book with call number " + item.callNumber + " and got id " + item.borid + ".");
 				}
 			}
 			con.commit();
@@ -590,6 +592,7 @@ public class Database {
 	 * Return fid of a newly created fine if item is overdue.
 	 */
 	public int processReturn(int borid) {
+		displayMessage("process return started for borid: " + borid); //TODO: REMOVE DEBUG PRINTLN
 		int fid = -1;
 		Statement stmt;
 		ResultSet rs;
@@ -609,15 +612,19 @@ public class Database {
 			}
 			callNumber = rs.getString("callNumber");
 			copyNo = rs.getString("copyNo");
+			displayMessage("process return associates callnumber " + callNumber + " and copyNo " + copyNo + " with this borid."); //TODO: REMOVE DEBUG PRINTLN
 			// set inDate = now
 			ps = con.prepareStatement("UPDATE BORROWING SET inDate=? WHERE borid=?");
 			ps.setDate(1, now);
 			ps.setInt(2, borid);
+			//ps.executeUpdate();
+			displayMessage("process return updated this borrowing's date with " + now.toString()); //TODO: REMOVE DEBUG PRINTLN
 			// set BOOKCOPY.status="in"
-			ps = con.prepareStatement("UPDATE BOOKCOPY SET status=in WHERE callNumber=? AND copyNo=?");
+			ps = con.prepareStatement("UPDATE BOOKCOPY SET status='in' WHERE callNumber=? AND copyNo=?");
 			ps.setString(1, callNumber);
 			ps.setString(2, copyNo);
 			ps.executeUpdate();
+			displayMessage("process return set status on book copy to in"); //TODO: REMOVE DEBUG PRINTLN
 			// check to see if the item is overdue. If overdue, Insert a fine
 			// tuple.
 			// rs=stmt.executeQuery("SELECT * FROM BORROWING where borid=");
@@ -626,39 +633,46 @@ public class Database {
 			ps.setInt(1, borid);
 			rs = ps.executeQuery();
 			rs.next();
-			if (rs.getDate("outDate").before(
-					new Date(new java.util.Date().getTime()
-							- rs.getLong("bookTimeLimit")))) {
+			Date checkoutDate = rs.getDate("outDate");
+			long checkoutTime = checkoutDate.getTime();
+			long timeLimit = rs.getLong("bookTimeLimit");
+			Date shouldaReturned = new Date(timeLimit+checkoutTime);
+			Date didReturned = new Date(new java.util.Date().getTime());
+			
+			displayMessage("return checking for overdue: book was borrowed on " + checkoutDate + "...");
+			displayMessage("by someone with time limit " + timeLimit/86400000.0 + " days...");
+			displayMessage("it should have been returned on " + shouldaReturned + "...");
+			displayMessage("and it was returned today (" + didReturned + ")."); //TODO: REMOVE DEBUG PRINTLNS
+			
+			if (shouldaReturned.before(didReturned)) {
 				// item is overdue
-				ps = con.prepareStatement("INSERT INTO FINE VALUES (fid_counter.nextval,?,?,?,? RETURNING fid");
+				ps = con.prepareStatement("INSERT INTO FINE VALUES (fid_counter.nextval,?,?,?,?)",new String[]{"fid"});
 				ps.setString(1, "100");
-				// java.util.Date javaDate=new java.util.Date();
-				// Date now=new Date(javaDate.getTime());
 				ps.setDate(2, now);
 				ps.setDate(3, new Date(0));
 				ps.setInt(4, borid);
 				ps.executeUpdate();
-				rs = ps.getResultSet();
+				rs = ps.getGeneratedKeys();
 				rs.next();
 				fid = rs.getInt(1);
+				displayMessage("Item was returned overdue, so $100 fine of id " + fid + " given."); //TODO: REMOVE DEBUG PRINTLNS
 			}
-			// check for holdRequest. If the item is requested, set status to
-			// "onHold".
-			ps = con.prepareStatement("SELECT * FROM HOLDREQUEST WHERE callNumber=?");
+			// check for holdRequest. If the item is requested, set status to "onHold".
+			ps = con.prepareStatement("SELECT * FROM HOLDREQUEST WHERE callNumber=?"); 
 			ps.setString(1, callNumber);
 			rs = ps.executeQuery();
-			if (rs.next()) {
+			if (rs.next()) { //TODO: check that this works when a hold request is in place
 				int bid_waiter = rs.getInt("bid");
-				// TODO: notify the guy that his reservation is ready
-				displayMessage("Hey yo your bid is "
+				displayMessage("Yo bid "
 						+ String.valueOf(bid_waiter)
-						+ " and you have reserved an item with call number "
-						+ callNumber + " that just came in!");
+						+ ", you reserved an item with call number "
+						+ callNumber + " whose copy " + copyNo + " just came in!");
+				//TODO: set status to "onHold"
 			}
-			stmt.close();
+			con.commit();
 			ps.close();
 			rs.close();
-			con.close();
+			stmt.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
