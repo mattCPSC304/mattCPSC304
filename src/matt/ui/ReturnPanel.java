@@ -22,7 +22,7 @@ public class ReturnPanel extends JPanel implements ActionListener{
 		
 		///////////data fields///////////
 		// add text fields
-		boridLabel = new JLabel(" borrower id:  ");
+		boridLabel = new JLabel(" borrowing id: ");
 		boridField = new JTextField(20);
 		boridField.addActionListener(this);
 		

@@ -21,9 +21,9 @@ public class Database {
 		loadJDBCDriver();
 		// connect("ora_t6e7", "a62970082"); //Lu's
 		// connect("ora_o3s7", "a82417106"); //Matt's
-		 connect("ora_h7a8", "a29146115"); //Michael's
+		// connect("ora_h7a8", "a29146115"); //Michael's
 		// connect(<ora_c#c#>, <a########>); //Alborz's
-		//   connect(helpful remember: use your own database!);
+		// connect(helpful remember: use your own database!);
 	}
 
 	public void loadJDBCDriver() {
@@ -566,8 +566,8 @@ public class Database {
 			long bookTimeLimit = rs.getLong("bookTimeLimit");
 			for (int i = 0; i < callNumbers.length; i++) {
 				// check items available for borrowing
-				rs = stmt.executeQuery("SELECT * FROM BOOKCOPY WHERE callNumber="
-								+ callNumbers[i] + " AND status='in'");
+				rs = stmt.executeQuery("SELECT * FROM BOOKCOPY WHERE callNumber='"
+								+ callNumbers[i] + "' AND status='in'");
 				if (rs.next() == false) {
 					displayMessage("The callNumber " + callNumbers[i]
 							+ " does not have copies in database");
@@ -750,14 +750,26 @@ public class Database {
 		return overdue;
 	}
 
-	public List<Book> search(String title, String author, String subject) { //TODO: search through other authors. TODO: search through subject
+	public List<Book> search(String title, String author, String subject) { //TODO: do all of this in one query if possible
 		Statement stmt;
 		ResultSet rs;
 		List<Book> books = new ArrayList<Book>();
 		try {
 			stmt = con.createStatement();
-			rs = stmt.executeQuery("SELECT * FROM BOOK WHERE " + "TITLE"
-					+ " LIKE '%" + title + "%' AND MAINAUTHOR LIKE '%" + author + "%'");
+			
+			//find book tuples matching search criteria
+			rs = stmt.executeQuery("SELECT * FROM BOOK WHERE TITLE LIKE '%" + title + "%'" +
+					"AND (CALLNUMBER IN (" +
+						"SELECT CALLNUMBER FROM HASAUTHOR " +
+						"WHERE BOOK.CALLNUMBER=HASAUTHOR.CALLNUMBER " +
+						"AND HASAUTHOR.name LIKE '%" + author + "%')" +
+						"OR '%" + author + "%'='%%')" + //unlike with title, if author or subject are blank, we have to cancel the check
+					"AND (CALLNUMBER IN (" +
+						"SELECT CALLNUMBER FROM HASSUBJECT " +
+						"WHERE BOOK.CALLNUMBER=HASSUBJECT.CALLNUMBER " +
+						"AND HASSUBJECT.subject LIKE '%" + subject + "%')" +
+						"OR '%" + subject + "%'='%%')");
+			
 			while (rs.next()) {
 				Book book = new Book();
 				book.callNumber = rs.getString("callNumber");
@@ -765,9 +777,33 @@ public class Database {
 				book.mainAuthor = rs.getString("mainAuthor");
 				book.publisher = rs.getString("publisher");
 				book.title = rs.getString("title");
-				book.year = rs.getString("year");
+				book.year = rs.getString("year");				
 				books.add(book);
 			}
+			
+			//compute additional book data
+			for (Book book: books) {
+				rs = stmt.executeQuery("SELECT COUNT(*) FROM BOOK,BOOKCOPY WHERE BOOK.CALLNUMBER='"+ book.callNumber + "' AND BOOK.CALLNUMBER=BOOKCOPY.CALLNUMBER AND BOOKCOPY.STATUS='in'");
+				rs.next();
+				book.in = rs.getInt(1);
+				
+				rs = stmt.executeQuery("SELECT COUNT(*) FROM BOOK,BOOKCOPY WHERE BOOK.CALLNUMBER='" + book.callNumber + "' AND BOOK.CALLNUMBER=BOOKCOPY.CALLNUMBER AND BOOKCOPY.STATUS='out'");
+				rs.next();
+				book.out = rs.getInt(1);
+
+				rs = stmt.executeQuery("SELECT NAME FROM BOOK,HASAUTHOR WHERE BOOK.CALLNUMBER='"+ book.callNumber + "' AND BOOK.CALLNUMBER=HASAUTHOR.CALLNUMBER");
+				while(rs.next()) {
+					book.secondaryAuthors.add(rs.getString(1));
+				}
+				
+				rs = stmt.executeQuery("SELECT SUBJECT FROM BOOK,HASSUBJECT WHERE BOOK.CALLNUMBER='"+ book.callNumber + "' AND BOOK.CALLNUMBER=HASSUBJECT.CALLNUMBER");
+				while(rs.next()) {
+					book.subjects.add(rs.getString(1));
+				}
+			}
+			
+			rs.close();
+			stmt.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

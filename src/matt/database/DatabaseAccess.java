@@ -2,6 +2,7 @@ package matt.database;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DatabaseAccess {
@@ -72,13 +73,13 @@ public class DatabaseAccess {
 		return data;
 	}
 	
-	public Object[][] getBooks(String title, String author, String subject) { //TODO: PROPERLY SEARCH FOR AUTHOR AND SUBJECT
+	public Object[][] getBooks(String title, String author, String subject) {
     	List<Book> books = new ArrayList<Book>();
     	books = db.search(title, author, subject);
     	Object[][] data = new Object[books.size()][6];
     	System.out.println("a search for books with title, author, subject: [" + title + ", " + author + ", " + subject + "] found " + books.size() + " books."); //TODO: REMOVE DEBUG CODE
     	for (int i = 0; i < books.size(); i++) {
-    		Object[] row = new Object[6];
+    		Object[] row = new Object[10];
     		Book book = books.get(i);
     		row[0] = book.callNumber;
     		row[1] = book.isbn;
@@ -86,6 +87,10 @@ public class DatabaseAccess {
     		row[3] = book.mainAuthor;
     		row[4] = book.publisher;
     		row[5] = book.year;
+    		row[6] = Arrays.deepToString(book.secondaryAuthors.toArray()); //TODO: properly regex the square brackets off
+    		row[7] = Arrays.deepToString(book.subjects.toArray());
+    		row[8] = book.in;
+    		row[9] = book.out;
     		data[i] = row;
     	}
     	return data;

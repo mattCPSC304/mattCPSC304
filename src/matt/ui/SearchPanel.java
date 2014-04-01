@@ -28,7 +28,7 @@ public class SearchPanel extends JPanel implements ActionListener {
 	protected DefaultTableModel resultsDm;
 	protected Object[][] defaultTableData = new Object[][] {};
 	protected String[] resultsColumnNames = 
-		{ "call number", "ISBN", "title", "main author", "publisher", "year" };
+		{ "call number", "ISBN", "title", "main author", "publisher", "year", "secondary authors", "subjects", "in", "out" };
 	protected JLabel resultsTableLabel;
 	protected JTable resultsTable;
 	protected JScrollPane resultsScroll;
