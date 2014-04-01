@@ -146,5 +146,24 @@ public class DatabaseAccess {
     	}
     	return data;
     }
+	
+	public Object[][] getPopularItems(String year, String n) { //TODO: PROPERLY SEARCH FOR AUTHOR AND SUBJECT
+    	List<Book> books = new ArrayList<Book>();
+    	books = db.popularItems((int) Integer.parseInt(year), (int) Integer.parseInt(n));
+    	Object[][] data = new Object[books.size()][6];
+    	System.out.println("searching " + n + " popular items borrowed in year: " + year); //TODO: REMOVE DEBUG CODE
+    	for (int i = 0; i < books.size(); i++) {
+    		Object[] row = new Object[6];
+    		Book book = books.get(i);
+    		row[0] = book.callNumber;
+    		row[1] = book.isbn;
+    		row[2] = book.title;
+    		row[3] = book.mainAuthor;
+    		row[4] = book.publisher;
+    		row[5] = book.year;
+    		data[i] = row;
+    	}
+    	return data;
+    }
 
 }

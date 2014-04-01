@@ -21,7 +21,7 @@ public class Database {
 		loadJDBCDriver();
 		// connect("ora_t6e7", "a62970082"); //Lu's
 		// connect("ora_o3s7", "a82417106"); //Matt's
-		// connect("ora_h7a8", "a29146115"); //Michael's
+		 connect("ora_h7a8", "a29146115"); //Michael's
 		// connect(<ora_c#c#>, <a########>); //Alborz's
 		//   connect(helpful remember: use your own database!);
 	}
@@ -1035,6 +1035,30 @@ public class Database {
 			e.printStackTrace();
 		}
 		return report;
+	}
+	
+	
+	public List<Book> popularItems(int year, int n) {
+		List<Book> books = new ArrayList<Book>();
+		Statement stmt;
+		ResultSet rs;
+		try {
+			stmt = con.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM BOOK"); //TODO: write actual SQL query
+			while (rs.next()) {
+				Book book = new Book();
+				book.callNumber = rs.getString("callNumber");
+				book.isbn = rs.getString("isbn");
+				book.mainAuthor = rs.getString("mainAuthor");
+				book.publisher = rs.getString("publisher");
+				book.title = rs.getString("title");
+				book.year = rs.getString("year");
+				books.add(book);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}	
+		return books;
 	}
 
 	// Borrower (bid, password, name, address, phone, emailAddress, sinOrStNo,
