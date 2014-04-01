@@ -60,14 +60,15 @@ public class DatabaseAccess {
 		Object[][] data = new Object[overdue.size()][6];
 		System.out.println("checking overdue items"); //TODO: REMOVE DEBUG CODE
 		for (int i = 0; i < overdue.size(); i++) {
-			Object[] row = new Object[6];
+			Object[] row = new Object[7];
 			Borrowing b = overdue.get(i);
 			row[0] = b.borid;
 			row[1] = b.bid;
-			row[2] = b.callNumber;
-			row[3] = b.copyNo;
-			row[4] = b.outDate;
-			row[5] = b.inDate;
+			row[2] = b.email;
+			row[3] = b.callNumber;
+			row[4] = b.copyNo;
+			row[5] = b.outDate;
+			row[6] = b.dueDate;
 			data[i] = row;
 		}
 		return data;

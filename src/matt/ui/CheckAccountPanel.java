@@ -74,7 +74,7 @@ public class CheckAccountPanel extends JPanel implements ActionListener { //TODO
 		fineTable.getTableHeader().setReorderingAllowed(false); 
 		
 		//add a button editor column to the table
-		buttonEditor = new ButtonEditor("pay fine", new DataAction() {
+		buttonEditor = new ButtonEditor("pay fine", new DataAction() { //TODO: THE PAY FINE BUTTON DOES NOT REFRESH CORRECTLy
 			public Integer act(Object data) {
 				String bid = textField.getText();
 				System.out.println("Paid fineid: " + data.toString());

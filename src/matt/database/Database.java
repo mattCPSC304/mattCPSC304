@@ -719,27 +719,27 @@ public class Database {
 	public List<Borrowing> checkOverdueItems() { //TODO: ONLY RETURN ITEMS THAT ARE OVERDUE AND OUT
 		List<Borrowing> overdue = new ArrayList<Borrowing>();
 		java.util.Date javaDate = new java.util.Date();
-		// Date now=new Date(javaDate.getTime());
+		Date now=new Date(javaDate.getTime());
 		Statement stmt;
 		ResultSet rs;
-		// PreparedStatement ps;
+		
 		try {
 			stmt = con.createStatement();
 			rs = stmt.executeQuery("SELECT * FROM BORROWING, BORROWER, BORROWERTYPE "
-							+ "WHERE BORROWING.bid=BORROWER.bid AND BORROWER.type=BORROWERTYPE.type");
+							+ "WHERE BORROWING.inDate <= to_date('19710101','YYYYMMDD') AND BORROWING.bid=BORROWER.bid AND BORROWER.type=BORROWERTYPE.type");
 			while (rs.next()) {
 				long timeLimit = rs.getLong("bookTimeLimit");
 				Date outDate = rs.getDate("outDate");
-				Date inDate = rs.getDate("inDate");
-				Date dueDate = new Date(outDate.getTime() + timeLimit);
-				if (inDate.before(dueDate)) {
+				long outTime = outDate.getTime();
+				Date dueDate = new Date(outTime + timeLimit);
+				if (now.after(dueDate)) {
 					Borrowing item = new Borrowing();
-					item.bid = rs.getInt("bid");
 					item.borid = rs.getInt("borid");
+					item.bid = rs.getInt("bid");
+					item.email = rs.getString("emailAddress");
 					item.callNumber = rs.getString("callNumber");
 					item.copyNo = rs.getString("copyNo");
 					item.outDate = outDate;
-					item.inDate = inDate;
 					item.dueDate = dueDate;
 					overdue.add(item);
 					displayMessage("overdue: bid: " + rs.getInt("borid")); //TODO: REMOVE DEBUG PRINTLNS

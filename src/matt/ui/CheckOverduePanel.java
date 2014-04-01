@@ -22,7 +22,7 @@ public class CheckOverduePanel extends JPanel implements ActionListener{
 		protected DefaultTableModel resultsDm;
 		protected Object[][] defaultTableData = new Object[][] {};
 		protected String[] resultsColumnNames = 
-			{ "borrow id", "book id", "call number", "copy number", "out date", "in date" };
+			{ "borrowing id", "borrower id", "borrower email", "book call number", "book copy number", "out date", "due date"};
 		protected JLabel resultsTableLabel;
 		protected JTable resultsTable;
 		protected JScrollPane resultsScroll;
