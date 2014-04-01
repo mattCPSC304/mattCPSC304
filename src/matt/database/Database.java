@@ -20,7 +20,7 @@ public class Database {
 	public Database() {
 		loadJDBCDriver();
 		// connect("ora_t6e7", "a62970082"); //Lu's
-		// connect("ora_o3s7", "a82417106"); //Matt's
+		connect("ora_o3s7", "a82417106"); //Matt's
 		// connect("ora_h7a8", "a29146115"); //Michael's
 		// connect(<ora_c#c#>, <a########>); //Alborz's
 		// connect(helpful remember: use your own database!);
@@ -72,7 +72,10 @@ public class Database {
 					+ " type VARCHAR(32) not NULL, " + " PRIMARY KEY ( bid ))";
 			stmt.executeUpdate(sql);
 			sql = "INSERT INTO BORROWER(bid, password, name, address, phone, emailAddress, sinOrStNo, expiryDate, type) " +
-					"VALUES (1,'1','1','1','1','1','1',TO_DATE('20130515', 'YYYYMMDD'),'1')";
+					"VALUES (1,'password','John Doe','1111 One St.','604-111-1111','john@gmail.com','12345678',TO_DATE('20130515', 'YYYYMMDD'),'student')";
+			stmt.executeUpdate(sql); //TODO: REMOVE DEBUG ENTRIES
+			sql = "INSERT INTO BORROWER(bid, password, name, address, phone, emailAddress, sinOrStNo, expiryDate, type) " +
+					"VALUES (2,'password','John Late','1111 One St.','604-111-1111','late@gmail.com','12345678',TO_DATE('20130515', 'YYYYMMDD'),'late')";
 			stmt.executeUpdate(sql); //TODO: REMOVE DEBUG ENTRIES
 			System.out.println("Table BORROWER created.");
 
@@ -83,9 +86,18 @@ public class Database {
 					+ " PRIMARY KEY ( type ))";
 			stmt.executeUpdate(sql);
 			sql = "INSERT INTO BORROWERTYPE(bookTimeLimit, type) " +
-					"VALUES (10, '1')"; // dates are in milliseconds since 1970. so 7 days in ms is
-										// 7 days * 24 hours/day * 60 minutes/hour * 60 seconds/minute * 1000ms/second = 604800000 //TODO: ADD THIS
-			stmt.executeUpdate(sql); //TODO: ADD PROPER TYPES
+					"VALUES (1209600000, 'student')"; // dates are in milliseconds since 1970. so 14 days in ms is
+														// 14 days * 24 hours/day * 60 minutes/hour * 60 seconds/minute * 1000ms/second = 1209600000 //TODO: ADD THIS
+			stmt.executeUpdate(sql);
+			sql = "INSERT INTO BORROWERTYPE(bookTimeLimit, type) " +
+					"VALUES (7257600000, 'faculty')"; 
+			stmt.executeUpdate(sql);
+			sql = "INSERT INTO BORROWERTYPE(bookTimeLimit, type) " +
+					"VALUES (3628800000, 'staff')"; 
+			stmt.executeUpdate(sql);
+			sql = "INSERT INTO BORROWERTYPE(bookTimeLimit, type) " +
+					"VALUES (10, 'late')"; // for illustrating late handling: this borrower type is essentially always late
+			stmt.executeUpdate(sql);
 			System.out.println("Table BORROWERTYPE created.");
 
 			// BOOK
@@ -174,7 +186,7 @@ public class Database {
 			displayMessage("fid_counter initiated");
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 	}
 
@@ -230,7 +242,7 @@ public class Database {
 			stmt.execute(sql);
 			System.out.println("Sequence fid_counter dropped");
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 	}
 
@@ -256,7 +268,7 @@ public class Database {
 			con.commit();
 			ps.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 	}
 
@@ -272,7 +284,7 @@ public class Database {
 			con.commit();
 			ps.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 	}
 
@@ -324,7 +336,7 @@ public class Database {
 			con.commit();
 			ps.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 	}
 
@@ -340,7 +352,7 @@ public class Database {
 			con.commit();
 			ps.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 	}
 
@@ -356,7 +368,7 @@ public class Database {
 			con.commit();
 			ps.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 	}
 
@@ -373,7 +385,7 @@ public class Database {
 			con.commit();
 			ps.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 	}
 
@@ -392,7 +404,7 @@ public class Database {
 			con.commit();
 			ps.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 	}
 
@@ -413,7 +425,7 @@ public class Database {
 			con.commit();
 			ps.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 	}
 
@@ -433,7 +445,7 @@ public class Database {
 			con.commit();
 			ps.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 	}
 
@@ -534,7 +546,7 @@ public class Database {
 			con.commit();
 			ps.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 	}
 
@@ -557,8 +569,8 @@ public class Database {
 				return checkoutList;
 			}
 			String borrowerType = rs.getString("type");
-			rs = stmt.executeQuery("SELECT * FROM BORROWERTYPE WHERE type="
-					+ borrowerType);
+			rs = stmt.executeQuery("SELECT * FROM BORROWERTYPE WHERE type='"
+					+ borrowerType + "'");
 			if (rs.next() == false) {
 				displayMessage("invalid borrower type.");
 				return checkoutList;
@@ -615,7 +627,7 @@ public class Database {
 			ps.close();
 			stmt.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 		// return a note with items and due date
 		return checkoutList;
@@ -711,7 +723,7 @@ public class Database {
 			rs.close();
 			stmt.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 		return fid;
 	}
@@ -748,7 +760,7 @@ public class Database {
 				}
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 		return overdue;
 	}
@@ -808,7 +820,7 @@ public class Database {
 			rs.close();
 			stmt.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 		return books;
 	}
@@ -832,7 +844,7 @@ public class Database {
 			stmt.close();
 			rs.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 		return fines;
 	}
@@ -859,7 +871,7 @@ public class Database {
 			stmt.close();
 			rs.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 		return books;
 	}
@@ -881,7 +893,7 @@ public class Database {
 			stmt.close();
 			rs.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 		return holdRequests;
 	}
@@ -910,7 +922,7 @@ public class Database {
 			rs.close();
 			ps.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 		return holdRequest;
 	}
@@ -930,7 +942,7 @@ public class Database {
 			stmt.close();
 			ps.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 	}
 
@@ -957,7 +969,7 @@ public class Database {
 			book.publisher = publisher;
 			book.year = year;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 		return book;
 	}
@@ -978,7 +990,7 @@ public class Database {
 			bookCopy.copyNo = copyNo;
 			bookCopy.status = "in";
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 		return bookCopy;
 	}
@@ -1017,7 +1029,7 @@ public class Database {
 			rs.close();
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 		return report;
 	}
@@ -1033,9 +1045,8 @@ public class Database {
 					+ "FROM BOOK bk, BOOKCOPY bc, BORROWING br, HASSUBJECT hs, BORROWER b, BORROWERTYPE bt "
 					+ "WHERE bk.callNumber=bc.callnumber AND bc.callNumber=br.callNumber AND "
 					+ "bc.callNumber=hs.callNumber AND b.type=bt.type AND br.bid=b.bid AND "
-					+ "bc.status='out' AND hs.subject=? "
+					+ "bc.status='out' AND hs.subject LIKE '%" + subject + "%'"
 					+ "ORDER BY bk.callNumber");
-			ps.setString(1, subject);
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				BookReportItem book = new BookReportItem();
@@ -1057,7 +1068,7 @@ public class Database {
 			rs.close();
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}
 		return report;
 	}
@@ -1069,19 +1080,28 @@ public class Database {
 		ResultSet rs;
 		try {
 			stmt = con.createStatement();
-			rs = stmt.executeQuery("SELECT * FROM BOOK"); //TODO: write actual SQL query
+			
+			rs = stmt.executeQuery("SELECT call, isbn, mainAuthor, publisher, title, year, " + //TODO: this query's timesborrowed thing is repeated thrice. This query can probably be simplified.
+										"(SELECT COUNT(*) FROM BORROWING WHERE BORROWING.CALLNUMBER=call AND EXTRACT(YEAR FROM BORROWING.OUTDATE) =" + year + ") AS timesBorrowed " + 
+										"FROM (SELECT CALLNUMBER AS call, isbn, mainAuthor, publisher, title, year " +
+												"FROM BOOK " +
+												"ORDER BY (SELECT COUNT(*) FROM BORROWING WHERE BORROWING.CALLNUMBER=BOOK.CALLNUMBER AND EXTRACT(YEAR FROM BORROWING.OUTDATE) =" + year + ") DESC" + 
+										")" +
+										"WHERE ROWNUM <="+n+" AND (SELECT COUNT(*) FROM BORROWING WHERE BORROWING.CALLNUMBER=call AND EXTRACT(YEAR FROM BORROWING.OUTDATE) =" + year + ") > 0");
+			
 			while (rs.next()) {
 				Book book = new Book();
-				book.callNumber = rs.getString("callNumber");
+				book.callNumber = rs.getString("call");
 				book.isbn = rs.getString("isbn");
 				book.mainAuthor = rs.getString("mainAuthor");
 				book.publisher = rs.getString("publisher");
 				book.title = rs.getString("title");
 				book.year = rs.getString("year");
+				book.timesBorrowed = rs.getInt("timesBorrowed");
 				books.add(book);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			e.printStackTrace(); displayMessage("error: please try entering correct information.");
 		}	
 		return books;
 	}

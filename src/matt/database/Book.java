@@ -11,10 +11,13 @@ public class Book {
 	public String mainAuthor=new String();
 	public String publisher=new String();
 	public String year=new String();
+	
+	//hacks to support related fields and properties
 	public ArrayList<String> secondaryAuthors=new ArrayList<String>();
 	public ArrayList<String> subjects=new ArrayList<String>();
 	public Integer in;
 	public Integer out;
+	public Integer timesBorrowed;
 	/*public Book(String CallNumber, String isbn, String title, String mainAuthor){
 		
 	}*/

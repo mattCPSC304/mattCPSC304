@@ -27,7 +27,7 @@ public class MostPopularPanel extends JPanel implements ActionListener {
 	protected DefaultTableModel resultsDm;
 	protected Object[][] defaultTableData = new Object[][] {};
 	protected String[] resultsColumnNames = 
-		{ "call number", "ISBN", "title", "main author", "publisher", "year" };
+		{ "call number", "ISBN", "title", "main author", "publisher", "year published", "times borrowed" };
 	protected JLabel resultsTableLabel;
 	protected JTable resultsTable;
 	protected JScrollPane resultsScroll;

@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -34,8 +35,14 @@ public class NewBorrowerPanel extends JPanel implements ActionListener{
 	protected JTextField expiryDateDayField;
 	protected JLabel typeLabel;
 	protected JTextField typeField;
+	
+	@SuppressWarnings("rawtypes")
+	protected JComboBox typeDropdown;
+	String[] choices = {"student","faculty","staff","late"};
+	
 	protected JButton addBorrowerButton;
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public NewBorrowerPanel() {
 		super(new GridBagLayout());
 		
@@ -82,8 +89,8 @@ public class NewBorrowerPanel extends JPanel implements ActionListener{
 		expiryDateDayField.addActionListener(this);
 		
 		typeLabel = new JLabel(" type ");
-		typeField = new JTextField(20);
-		typeField.addActionListener(this);
+		typeDropdown = new JComboBox(choices);
+		typeDropdown.setEditable(true);
 		
 		// add the add button
 		addBorrowerButton = new JButton("add borrower");
@@ -266,7 +273,7 @@ public class NewBorrowerPanel extends JPanel implements ActionListener{
 		c.gridy = 10;
 		c.weightx = 1.0;
 		c.weighty = 0.0;
-		this.add(typeField, c);
+		this.add(typeDropdown, c);
 		
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 3;
@@ -288,7 +295,8 @@ public class NewBorrowerPanel extends JPanel implements ActionListener{
 		String expiryDateYear =  expiryDateYearField.getText();
 		String expiryDateMonth =  expiryDateMonthField.getText();
 		String expiryDateDay =  expiryDateDayField.getText();
-		String type =  typeField.getText();
+		//String type =  typeField.getText();
+		String type = (String) typeDropdown.getSelectedItem();
 		System.out.println("adding borrower: " + bid + ", " + password + ", " + name + ", " + address + ", " + phone + ", " + emailAddress + ", " + sinOrStNo + ", " + expiryDateYear + ", " + expiryDateMonth + ", " + expiryDateDay + ", " + type);
 		Main.getDbAccess().addBorrower(bid, password, name, address, phone, emailAddress, sinOrStNo, expiryDateYear, expiryDateMonth, expiryDateDay, type);
 	}
