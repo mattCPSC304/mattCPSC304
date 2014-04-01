@@ -72,11 +72,11 @@ public class DatabaseAccess {
 		return data;
 	}
 	
-	public Object[][] getBooks(String searchString) { //a simple search through the books for titles
+	public Object[][] getBooks(String title, String author, String subject) { //TODO: PROPERLY SEARCH FOR AUTHOR AND SUBJECT
     	List<Book> books = new ArrayList<Book>();
-    	books = db.search(searchString, "title");
+    	books = db.search(title, author, subject);
     	Object[][] data = new Object[books.size()][6];
-    	System.out.println("getbooks on title string: " + searchString + " found " + books.size() + " books."); //TODO: REMOVE DEBUG CODE
+    	System.out.println("a search for books with title, author, subject: [" + title + ", " + author + ", " + subject + "] found " + books.size() + " books."); //TODO: REMOVE DEBUG CODE
     	for (int i = 0; i < books.size(); i++) {
     		Object[] row = new Object[6];
     		Book book = books.get(i);
@@ -97,8 +97,8 @@ public class DatabaseAccess {
 	}
 	
 	public void addBook(String callNumber, String isbn, String title,
-			String mainAuthor, String publisher, String year) { // a simple addition of a book by fields
-		db.insertBook(callNumber, isbn, title, mainAuthor, publisher, year);
+			String mainAuthor, String publisher, String year, String[] secondaryAuthors, String[] subjects) { // a simple addition of a book by fields
+		db.insertBook(callNumber, isbn, title, mainAuthor, publisher, year, secondaryAuthors, subjects);
 		System.out.println("book added: isbn: " + isbn); //TODO: REMOVE DEBUG CODE
 	}
 	

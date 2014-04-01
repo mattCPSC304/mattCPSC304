@@ -5,6 +5,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -29,6 +30,10 @@ public class AddBookPanel extends JPanel {
 	protected JTextField publisherField;
 	protected JLabel yearLabel;
 	protected JTextField yearField;
+	protected JLabel secondaryAuthorsLabel;
+	protected JTextField secondaryAuthorsField;
+	protected JLabel subjectsLabel;
+	protected JTextField subjectsField;
 	protected JButton addBookButton;
 	protected ActionListener addBook;
 	
@@ -58,8 +63,10 @@ public class AddBookPanel extends JPanel {
 				String mainAuthor = mainAuthorField.getText();
 				String publisher = publisherField.getText();
 				String year = yearField.getText();
-				System.out.println("adding book: " + callNumber + ", " + isbn + ", " + title + ", " + mainAuthor + ", " + publisher + ", " + year);
-				Main.getDbAccess().addBook(callNumber, isbn, title, mainAuthor, publisher, year);
+				String[] secondaryAuthors = secondaryAuthorsField.getText().trim().split("\\s*,\\s*");
+				String[] subjects = subjectsField.getText().trim().split("\\s*,\\s*");
+				System.out.println("adding book: " + callNumber + ", " + isbn + ", " + title + ", " + mainAuthor + ", " + publisher + ", " + year + ", " + Arrays.deepToString(secondaryAuthors) + ", " + Arrays.deepToString(subjects));
+				Main.getDbAccess().addBook(callNumber, isbn, title, mainAuthor, publisher, year, secondaryAuthors, subjects);
 			};
 		};
 		
@@ -91,6 +98,14 @@ public class AddBookPanel extends JPanel {
 		yearLabel = new JLabel(" year:  ");
 		yearField = new JTextField(20);
 		yearField.addActionListener(addBook);
+		
+		secondaryAuthorsLabel = new JLabel("secondary authors (comma list):");
+		secondaryAuthorsField = new JTextField(20);
+		secondaryAuthorsField.addActionListener(addBook);
+		
+		subjectsLabel = new JLabel("subjects (comma list):");
+		subjectsField = new JTextField(20);
+		subjectsField.addActionListener(addBook);
 
 		// add the add button
 		addBookButton = new JButton("add book");
@@ -106,7 +121,6 @@ public class AddBookPanel extends JPanel {
 		c.weightx = 0.0;
 		c.weighty = 0.0;
 		bookPanel.add(callNumberLabel, c);
-
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 2;
 		c.gridx = 1;
@@ -122,7 +136,6 @@ public class AddBookPanel extends JPanel {
 		c.weightx = 0.0;
 		c.weighty = 0.0;
 		bookPanel.add(isbnLabel, c);
-
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 2;
 		c.gridx = 1;
@@ -138,7 +151,6 @@ public class AddBookPanel extends JPanel {
 		c.weightx = 0.0;
 		c.weighty = 0.0;
 		bookPanel.add(titleLabel, c);
-
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 2;
 		c.gridx = 1;
@@ -154,7 +166,6 @@ public class AddBookPanel extends JPanel {
 		c.weightx = 0.0;
 		c.weighty = 0.0;
 		bookPanel.add(mainAuthorLabel, c);
-
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 2;
 		c.gridx = 1;
@@ -170,7 +181,6 @@ public class AddBookPanel extends JPanel {
 		c.weightx = 0.0;
 		c.weighty = 0.0;
 		bookPanel.add(publisherLabel, c);
-
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 2;
 		c.gridx = 1;
@@ -186,7 +196,6 @@ public class AddBookPanel extends JPanel {
 		c.weightx = 0.0;
 		c.weighty = 0.0;
 		bookPanel.add(yearLabel, c);
-
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 2;
 		c.gridx = 1;
@@ -194,11 +203,41 @@ public class AddBookPanel extends JPanel {
 		c.weightx = 1.0;
 		c.weighty = 0.0;
 		bookPanel.add(yearField, c);
+		
+		c.fill = GridBagConstraints.NONE;
+		c.gridwidth = 1;
+		c.gridx = 0;
+		c.gridy = 6;
+		c.weightx = 0.0;
+		c.weighty = 0.0;
+		bookPanel.add(secondaryAuthorsLabel, c);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 2;
+		c.gridx = 1;
+		c.gridy = 6;
+		c.weightx = 1.0;
+		c.weighty = 0.0;
+		bookPanel.add(secondaryAuthorsField, c);
+		
+		c.fill = GridBagConstraints.NONE;
+		c.gridwidth = 1;
+		c.gridx = 0;
+		c.gridy = 7;
+		c.weightx = 0.0;
+		c.weighty = 0.0;
+		bookPanel.add(subjectsLabel, c);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 2;
+		c.gridx = 1;
+		c.gridy = 7;
+		c.weightx = 1.0;
+		c.weighty = 0.0;
+		bookPanel.add(subjectsField, c);
 
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 3;
 		c.gridx = 0;
-		c.gridy = 6;
+		c.gridy = 8;
 		c.weightx = 1.0;
 		c.weighty = 0.0;
 		bookPanel.add(addBookButton, c);

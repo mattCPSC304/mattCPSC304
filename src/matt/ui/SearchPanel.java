@@ -16,8 +16,12 @@ import javax.swing.table.DefaultTableModel;
 @SuppressWarnings("serial")
 public class SearchPanel extends JPanel implements ActionListener {
 	// search
-	protected JLabel searchLabel;
-	protected JTextField searchField;
+	protected JLabel titleLabel;
+	protected JTextField titleField;
+	protected JLabel authorLabel;
+	protected JTextField authorField;
+	protected JLabel subjectLabel;
+	protected JTextField subjectField;
 	protected JButton searchButton;
 	
 	// results table
@@ -33,12 +37,20 @@ public class SearchPanel extends JPanel implements ActionListener {
 		super(new GridBagLayout());
 
 		// //////////////////////search bar//////////////////////////
-		// add a text field
-		searchLabel = new JLabel(" title:  ");
-		searchField = new JTextField(20);
-		searchField.addActionListener(this);
+		//add search fields
+		titleLabel = new JLabel(" title:  ");
+		titleField = new JTextField(20);
+		titleField.addActionListener(this);
 
-		// add a search button
+		authorLabel = new JLabel(" author:  ");
+		authorField = new JTextField(20);
+		authorField.addActionListener(this);
+
+		subjectLabel = new JLabel(" subject:  ");
+		subjectField = new JTextField(20);
+		subjectField.addActionListener(this);
+		
+		//add search button
 		searchButton = new JButton("search");
 		searchButton.addActionListener(this);
 
@@ -66,27 +78,55 @@ public class SearchPanel extends JPanel implements ActionListener {
 		c.gridy = 0;
 		c.weightx = 0.0;
 		c.weighty = 0.0;
-		add(searchLabel, c);
-
-		c.fill = GridBagConstraints.HORIZONTAL; // should consume horizontal
-												// space
-		c.gridwidth = 2;
+		add(titleLabel, c);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 3;
 		c.gridx = 1;
 		c.gridy = 0;
-		c.weightx = 1.0; // should consume horizontal space
+		c.weightx = 1.0;
 		c.weighty = 0.0;
-		add(searchField, c);
+		add(titleField, c);
+		
+		c.fill = GridBagConstraints.NONE;
+		c.gridwidth = 1;
+		c.gridx = 4;
+		c.gridy = 0;
+		c.weightx = 0.0;
+		c.weighty = 0.0;
+		add(authorLabel, c);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 3;
+		c.gridx = 5;
+		c.gridy = 0;
+		c.weightx = 1.0;
+		c.weighty = 0.0;
+		add(authorField, c);
+		
+		c.fill = GridBagConstraints.NONE;
+		c.gridwidth = 1;
+		c.gridx = 8;
+		c.gridy = 0;
+		c.weightx = 0.0;
+		c.weighty = 0.0;
+		add(subjectLabel, c);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 3;
+		c.gridx = 9;
+		c.gridy = 0;
+		c.weightx = 1.0;
+		c.weighty = 0.0;
+		add(subjectField, c);
 
 		c.fill = GridBagConstraints.NONE;
 		c.gridwidth = 1;
-		c.gridx = 3;
+		c.gridx = 12;
 		c.gridy = 0;
 		c.weightx = 0.0;
 		c.weighty = 0.0;
 		add(searchButton, c);
-
+		
 		c.fill = GridBagConstraints.CENTER;
-		c.gridwidth = 4;
+		c.gridwidth = 13;
 		c.gridx = 0;
 		c.gridy = 1;
 		c.weightx = 1.0;
@@ -94,7 +134,7 @@ public class SearchPanel extends JPanel implements ActionListener {
 		add(resultsTableLabel, c);
 
 		c.fill = GridBagConstraints.BOTH;
-		c.gridwidth = 4;
+		c.gridwidth = 13;
 		c.gridx = 0;
 		c.gridy = 2;
 		c.weightx = 1.0;
@@ -104,9 +144,11 @@ public class SearchPanel extends JPanel implements ActionListener {
 
 	// handles the searches
 	public void actionPerformed(ActionEvent evt) {
-		String text = searchField.getText();
-		System.out.println("searching for: " + text);
-		Object[][] queryResults = Main.getDbAccess().getBooks(text);
+		String title = titleField.getText();
+		String author = authorField.getText();
+		String subject = subjectField.getText();
+		System.out.println("searching for text, author, subject: " + title + ", " + author + ", " + subject);
+		Object[][] queryResults = Main.getDbAccess().getBooks(title, author, subject);
 		resultsTable.setModel(new DefaultTableModel(queryResults, resultsColumnNames));
 	}
 }

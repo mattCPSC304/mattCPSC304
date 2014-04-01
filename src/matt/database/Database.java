@@ -22,8 +22,7 @@ public class Database {
 		// connect("ora_t6e7", "a62970082"); //Lu's
 		// connect("ora_o3s7", "a82417106"); //Matt's
 		// connect("ora_h7a8", "a29146115"); //Michael's
-		// connect(<ora_c#c#>, <a########>); //Alborz's //TODO: PUT YOUR INFO HERE ALBORZ
-		   connect(helpful remember: use your own database!);
+		// connect(<ora_c#c#>, <a########>); //Alborz's
 	}
 
 	public void loadJDBCDriver() {
@@ -279,9 +278,11 @@ public class Database {
 	// BOOK
 	// Book (callNumber, isbn, title, mainAuthor, publisher, year )
 	public void insertBook(String callNumber, String isbn, String title,
-			String mainAuthor, String publisher, String year) {
+			String mainAuthor, String publisher, String year, String[] secondaryAuthors, String[] subjects) {
 		PreparedStatement ps;
 		try {
+			// add the book
+			System.out.println("1");
 			ps = con.prepareStatement("INSERT INTO BOOK VALUES (?,?,?,?,?,?)");
 			ps.setString(1, callNumber);
 			ps.setString(2, isbn);
@@ -290,6 +291,35 @@ public class Database {
 			ps.setString(5, publisher);
 			ps.setString(6, year);
 			ps.executeUpdate();
+			
+			// add the main author
+			System.out.println("2");
+			ps = con.prepareStatement("INSERT INTO HASAUTHOR VALUES (?,?)");
+			ps.setString(1, callNumber);
+			ps.setString(2, mainAuthor);
+			ps.executeUpdate();
+			
+			// add the secondary authors
+			System.out.println("3");
+			for (int i = 0; i<secondaryAuthors.length; i++) {
+				// TODO: check for duplicate somehow
+				ps = con.prepareStatement("INSERT INTO HASAUTHOR VALUES (?,?)");
+				ps.setString(1, callNumber);
+				ps.setString(2, secondaryAuthors[i]);
+				ps.executeUpdate();
+			}
+			
+			// add the subjects
+			System.out.println("4");
+			for (int i = 0; i<subjects.length; i++) {
+				// TODO: check for duplicate somehow
+				ps = con.prepareStatement("INSERT INTO HASSUBJECT VALUES (?,?)");
+				ps.setString(1, callNumber);
+				ps.setString(2, subjects[i]);
+				ps.executeUpdate();
+			}
+			
+			System.out.println("5");
 			con.commit();
 			ps.close();
 		} catch (SQLException e) {
@@ -719,14 +749,14 @@ public class Database {
 		return overdue;
 	}
 
-	public List<Book> search(String keyword, String type) {
+	public List<Book> search(String title, String author, String subject) { //TODO: search through other authors. TODO: search through subject
 		Statement stmt;
 		ResultSet rs;
 		List<Book> books = new ArrayList<Book>();
 		try {
 			stmt = con.createStatement();
-			rs = stmt.executeQuery("SELECT * FROM BOOK WHERE " + type
-					+ " LIKE '%" + keyword + "%' ");
+			rs = stmt.executeQuery("SELECT * FROM BOOK WHERE " + "TITLE"
+					+ " LIKE '%" + title + "%' AND MAINAUTHOR LIKE '%" + author + "%'");
 			while (rs.next()) {
 				Book book = new Book();
 				book.callNumber = rs.getString("callNumber");
@@ -825,9 +855,10 @@ public class Database {
 			Date issuedDate) {
 		HoldRequest holdRequest = new HoldRequest();
 		ResultSet rs;
+		ResultSet rk;
 		PreparedStatement ps;
 		try {
-			ps = con.prepareStatement("INSERT INTO HOLDREQUEST VALUES (hid_counter.nextval,?,?,?)",new String[]{"hid"});
+			ps = con.prepareStatement("INSERT INTO HOLDREQUEST VALUES (hid_counter.nextval,?,?,?)",new String[]{"hid"}); //TODO: test, was never tested
 			ps.setInt(1, bid);
 			ps.setString(2, callNumber);
 			ps.setDate(3, issuedDate);
@@ -835,7 +866,8 @@ public class Database {
 			rs = ps.getResultSet();
 			rs = ps.getGeneratedKeys();
 			rs.next();
-			holdRequest.hid = rs.getInt(1);
+			rk = ps.getGeneratedKeys();
+			holdRequest.hid = rk.getInt(1);
 			holdRequest.bid = bid;
 			holdRequest.callNumber = callNumber;
 			holdRequest.issuedDate = issuedDate;
@@ -860,7 +892,7 @@ public class Database {
 			Date now = new Date(javaDate.getTime());
 			ps.setDate(1, now);
 			ps.setInt(2, fid);
-			rs = stmt.executeQuery("SELECT * FROM FINE WHERE fid = " + fid);
+			rs = stmt.executeQuery("SELECT * FROM FINE WHERE fid = " + String.valueOf(fid));
 			rs.next();
 			fine.fid = fid;
 			fine.amount = rs.getString("amount");
@@ -932,7 +964,7 @@ public class Database {
 		java.util.Date javaDate = new java.util.Date();
 		Date now = new Date(javaDate.getTime());
 		try {
-			ps = con.prepareStatement("SELECT callNumber, copyNo, outDate, title, bookTimeLimit "
+			ps = con.prepareStatement("SELECT bk.callNumber, bc.copyNo, br.outDate, bk.title, bt.bookTimeLimit "
 					+ "FROM BOOK bk, BOOKCOPY bc, BORROWING br, BORROWER b, BORROWERTYPE bt "
 					+ "WHERE bk.callNumber=bc.callnumber AND bc.callNumber=br.callNumber AND "
 					+ "b.type=bt.type AND br.bid=b.bid "
@@ -968,7 +1000,7 @@ public class Database {
 		java.util.Date javaDate = new java.util.Date();
 		Date now = new Date(javaDate.getTime());
 		try {
-			ps = con.prepareStatement("SELECT callNumber, copyNo, subject, outDate, title, bookTimeLimit "
+			ps = con.prepareStatement("SELECT bk.callNumber, bc.copyNo, hs.subject, br.outDate, bk.title, bt.bookTimeLimit "
 					+ "FROM BOOK bk, BOOKCOPY bc, BORROWING br, HASSUBJECT hs, BORROWER b, BORROWERTYPE bt "
 					+ "WHERE bk.callNumber=bc.callnumber AND bc.callNumber=br.callNumber AND "
 					+ "bc.callNumber=hs.callNumber AND b.type=bt.type AND br.bid=b.bid "
