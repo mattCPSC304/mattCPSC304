@@ -96,6 +96,52 @@ public class DatabaseAccess {
     	return data;
     }
 	
+	public Object[][] getFines(String bid) {
+		List<Fine> fines = new ArrayList<Fine>();
+		fines = db.getFines(Integer.parseInt(bid));
+		Object[][]data = new Object[fines.size()][6];
+		for (int i = 0; i < fines.size(); i++) {
+    		Object[] row = new Object[3];
+    		Fine fine = fines.get(i);
+    		row[0] = fine.fid;
+    		row[1] = fine.amount;
+    		row[2] = fine.issuedDate;
+    		data[i] = row;
+    	}
+		return data;
+	}
+	
+	public Object[][] getCheckedOut(String bid) {
+		List<BorrowedBook> books = new ArrayList<BorrowedBook>();
+		books = db.getBorrowedBooks(Integer.parseInt(bid));
+		Object[][]data = new Object[books.size()][6];
+		for (int i = 0; i < books.size(); i++) {
+    		Object[] row = new Object[4];
+    		BorrowedBook book = books.get(i);
+    		row[0] = book.callNumber;
+    		row[1] = book.isbn;
+    		row[2] = book.title;
+    		row[3] = book.mainAuthor;
+    		data[i] = row;
+    	}
+		return data;
+	}
+	
+	public Object[][] getHoldRequests(String bid) {
+		List<HoldRequest> holdRequests = new ArrayList<HoldRequest>();
+		holdRequests = db.getHoldRequests(Integer.parseInt(bid));
+		Object[][]data = new Object[holdRequests.size()][3];
+		for (int i = 0; i < holdRequests.size(); i++) {
+    		Object[] row = new Object[10];
+    		HoldRequest holdRequest = holdRequests.get(i);
+    		row[0] = holdRequest.callNumber;
+    		row[1] = holdRequest.issuedDate;
+    		//row[2] = holdRequest.hid;
+    		data[i] = row;
+    	}
+		return data;
+	}
+	
 	public void holdRequest(String bid, String callNumber, Date issuedDate) {
 		db.placeHoldRequest((int) Integer.parseInt(bid), callNumber, issuedDate);
 		System.out.println("hold request placed for borrower" + bid + " on book " + callNumber);

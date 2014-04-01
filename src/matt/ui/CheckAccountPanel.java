@@ -24,21 +24,21 @@ public class CheckAccountPanel extends JPanel implements ActionListener { //TODO
 	//fine table
 	protected ButtonEditor buttonEditor;
 	protected DefaultTableModel fineDm;   	
-	protected String[] fineColumnNames = { "pay fine", "call number", "ISBN", "title","main author","publisher","year"};
+	protected String[] fineColumnNames = { "pay fine", "amount", "issued date"};
 	protected JLabel fineTableLabel;
 	protected JTable fineTable;
 	protected JScrollPane fineScroll;
 	
 	//checked out table
 	protected DefaultTableModel checkedOutDm;
-	protected String[] checkedOutColumnNames = {"call number", "ISBN", "title","main author","publisher","year"};
+	protected String[] checkedOutColumnNames = {"call number", "ISBN", "title","main author"};
 	protected JLabel checkedOutTableLabel;
 	protected JTable checkedOutTable;
 	protected JScrollPane checkedOutScroll;
 	
 	//hold request table
 	protected DefaultTableModel holdRequestDm;
-	protected String[] holdRequestColumnNames = { "hold request id", "borrower id", "call number", "issued date"};
+	protected String[] holdRequestColumnNames = { "call number", "issued date"};
 	protected JLabel holdRequestTableLabel;
 	protected JTable holdRequestTable;
 	protected JScrollPane holdRequestScroll;
@@ -205,10 +205,12 @@ public class CheckAccountPanel extends JPanel implements ActionListener { //TODO
 	public void actionPerformed(ActionEvent evt) { //TODO: hook this up to something proper
         String text = textField.getText();
         System.out.println("searching for: " + text);
-        Object[][] queryResults = Main.getDbAccess().getBooks(text, text, text);
-        fineTable.setModel(new DefaultTableModel(queryResults, fineColumnNames));
-        checkedOutTable.setModel(new DefaultTableModel(queryResults, checkedOutColumnNames));
-        holdRequestTable.setModel(new DefaultTableModel(queryResults, holdRequestColumnNames));
+        Object[][] fineResults = Main.getDbAccess().getFines(text);
+        Object[][] checkedOutResults = Main.getDbAccess().getCheckedOut(text);
+        Object[][] holdRequestResults = Main.getDbAccess().getHoldRequests(text);
+        fineTable.setModel(new DefaultTableModel(fineResults, fineColumnNames));
+        checkedOutTable.setModel(new DefaultTableModel(checkedOutResults, checkedOutColumnNames));
+        holdRequestTable.setModel(new DefaultTableModel(holdRequestResults, holdRequestColumnNames));
         attachButtonEditorToFineTable();
     }
 }

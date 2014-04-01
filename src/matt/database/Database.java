@@ -810,32 +810,47 @@ public class Database {
 		return books;
 	}
 
-	// Note that the returned object does not have overDue correctly
-	// implemented.
-	public AccountInfo checkAccount(int bid) {
+	//TODO: BROKEN
+	public List<Fine> getFines(int bid) {
+		Statement stmt;
+		ResultSet rs;
+		List<Fine> fines = new ArrayList<Fine>();
+		try {
+			stmt = con.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM FINE,BORROWING WHERE FINE.BORID=BORROWING.BORID AND FINE.PAIDDATE <= to_date('19710101','YYYYMMDD') AND BORROWING.BID=" + bid); //this filters only unpaid fines by finding fines where paid date was set to the default ~1970 value
+			while (rs.next()) {
+				if (rs.getDate("paidDate") == new Date(0)) {
+					Fine fine = new Fine();
+					fine.fid = rs.getInt("fid");
+					fine.amount = rs.getString("amount");
+					fine.issuedDate = rs.getDate("issuedDate");
+					fine.paidDate = rs.getDate("paidDate");
+					fine.borid = rs.getInt("borid");
+					fines.add(fine);
+				}
+			}
+			stmt.close();
+			rs.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return fines;
+	}
+	
+	//TODO: BROKEN
+	public List<BorrowedBook> getBorrowedBooks(int bid) { // TODO: borrowed books that haven't been returned (something about overdue not implemented right?)
 		Statement stmt;
 		ResultSet rs;
 		Statement stmt1;
 		ResultSet rs1;
-		// List<BorrowedBook> borrowedBooks= new ArrayList<BorrowedBook>();
-		AccountInfo accountInfo = new AccountInfo();
+		List<BorrowedBook> books = new ArrayList<BorrowedBook>();
 		try {
 			stmt = con.createStatement();
 			stmt1 = con.createStatement();
+			//get borrowed books for borrower
 			rs = stmt.executeQuery("SELECT * FROM BORROWING WHERE bid=" + bid);
-			rs1 = stmt.executeQuery("SELECT * FROM BORROWING WHERE bid=" + bid);// This
-																				// line
-																				// is
-																				// only
-																				// needed
-																				// to
-																				// initialize
-																				// rs1
-																				// to
-																				// close
-																				// it.
-			// java.util.Date javaDate=new java.util.Date();
-			// Date now=new Date(javaDate.getTime());
+			// This line is only needed to initialize rs1 to close it
+			rs1 = stmt.executeQuery("SELECT * FROM BORROWING WHERE bid=" + bid);
 			while (rs.next()) {
 				if (rs.getDate("inDate") == new Date(0)) {
 					BorrowedBook book = new BorrowedBook();
@@ -853,31 +868,9 @@ public class Database {
 					book.borid = rs.getInt("borid");
 					book.copyNo = rs.getString("copyNo");
 					book.bid = bid;
-					accountInfo.borrowedBooks.add(book);
+					books.add(book);
 				}
 			}
-			rs = stmt.executeQuery("SELECT * FROM FINE WHERE bid=" + bid);
-			while (rs.next()) {
-				if (rs.getDate("paidDate") == new Date(0)) {
-					Fine fine = new Fine();
-					fine.fid = rs.getInt("fid");
-					fine.amount = rs.getString("amount");
-					fine.issuedDate = rs.getDate("issuedDate");
-					fine.paidDate = rs.getDate("paidDate");
-					fine.borid = rs.getInt("borid");
-					accountInfo.fines.add(fine);
-				}
-			}
-			rs = stmt
-					.executeQuery("SELECT * FROM HOLDREQUEST WHERE bid=" + bid);
-			while (rs.next()) {
-				HoldRequest holdRequest = new HoldRequest();
-				holdRequest.hid = rs.getInt("hid");
-				holdRequest.bid = rs.getInt("bid");
-				holdRequest.callNumber = rs.getString("callNumber");
-				accountInfo.holdRequests.add(holdRequest);
-			}
-			// con.commit(); // no need to commit because not updating.
 			stmt.close();
 			stmt1.close();
 			rs.close();
@@ -885,9 +878,31 @@ public class Database {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return accountInfo;
+		return books;
 	}
-
+	
+	public List<HoldRequest> getHoldRequests(int bid) {
+		Statement stmt;
+		ResultSet rs;
+		List<HoldRequest> holdRequests = new ArrayList<HoldRequest>();
+		try {
+			stmt = con.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM HOLDREQUEST WHERE bid=" + bid);
+			while (rs.next()) {
+				HoldRequest holdRequest = new HoldRequest();
+				holdRequest.hid = rs.getInt("hid");
+				holdRequest.bid = rs.getInt("bid");
+				holdRequest.callNumber = rs.getString("callNumber");
+				holdRequests.add(holdRequest);
+			}
+			stmt.close();
+			rs.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return holdRequests;
+	}
+	
 	public HoldRequest placeHoldRequest(int bid, String callNumber,
 			Date issuedDate) {
 		HoldRequest holdRequest = new HoldRequest();
