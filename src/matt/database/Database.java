@@ -23,6 +23,7 @@ public class Database {
 		// connect("ora_o3s7", "a82417106"); //Matt's
 		// connect("ora_h7a8", "a29146115"); //Michael's
 		// connect(<ora_c#c#>, <a########>); //Alborz's
+		//   connect(helpful remember: use your own database!);
 	}
 
 	public void loadJDBCDriver() {
@@ -966,8 +967,8 @@ public class Database {
 		try {
 			ps = con.prepareStatement("SELECT bk.callNumber, bc.copyNo, br.outDate, bk.title, bt.bookTimeLimit "
 					+ "FROM BOOK bk, BOOKCOPY bc, BORROWING br, BORROWER b, BORROWERTYPE bt "
-					+ "WHERE bk.callNumber=bc.callnumber AND bc.callNumber=br.callNumber AND "
-					+ "b.type=bt.type AND br.bid=b.bid "
+					+ "WHERE bk.callNumber=bc.callNumber AND bc.callNumber=br.callNumber AND "
+					+ "b.type=bt.type AND br.bid=b.bid AND "
 					+ "bc.status='out' "
 					+ "ORDER BY bk.callNumber");
 			rs = ps.executeQuery();
@@ -985,7 +986,10 @@ public class Database {
 				} else {
 					book.overdue = false;
 				}
+				report.add(book);
 			}
+			ps.close();
+			rs.close();
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1003,7 +1007,7 @@ public class Database {
 			ps = con.prepareStatement("SELECT bk.callNumber, bc.copyNo, hs.subject, br.outDate, bk.title, bt.bookTimeLimit "
 					+ "FROM BOOK bk, BOOKCOPY bc, BORROWING br, HASSUBJECT hs, BORROWER b, BORROWERTYPE bt "
 					+ "WHERE bk.callNumber=bc.callnumber AND bc.callNumber=br.callNumber AND "
-					+ "bc.callNumber=hs.callNumber AND b.type=bt.type AND br.bid=b.bid "
+					+ "bc.callNumber=hs.callNumber AND b.type=bt.type AND br.bid=b.bid AND "
 					+ "bc.status='out' AND hs.subject=? "
 					+ "ORDER BY bk.callNumber");
 			ps.setString(1, subject);
@@ -1022,7 +1026,10 @@ public class Database {
 				} else {
 					book.overdue = false;
 				}
+				report.add(book);
 			}
+			ps.close();
+			rs.close();
 
 		} catch (SQLException e) {
 			e.printStackTrace();

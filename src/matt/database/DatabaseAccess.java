@@ -106,5 +106,45 @@ public class DatabaseAccess {
 		db.insertBookCopy(callNumber, copyNo, status);
 		System.out.println("book copy added: callNumber: " + callNumber); //TODO: REMOVE DEBUG CODE
 	}
+	
+	public Object[][] bookReport() { 
+    	List<BookReportItem> books = new ArrayList<BookReportItem>();
+    	books = db.outBookReport();
+    	Object[][] data = new Object[books.size()][7];
+    	System.out.println("book report no subject: " + " found " + books.size() + " books."); //TODO: REMOVE DEBUG CODE
+    	for (int i = 0; i < books.size(); i++) {
+    		Object[] row = new Object[7];
+    		BookReportItem book = books.get(i);
+    		row[0] = book.callNumber;
+    		row[1] = book.copyNo;
+    		row[2] = book.title;
+    		row[3] = book.subject;
+    		row[4] = book.outDate;
+    		row[5] = book.dueDate;
+    		row[6] = book.overdue;
+    		data[i] = row;
+    	}
+    	return data;
+    }
+	
+	public Object[][] bookReport(String subject) { 
+    	List<BookReportItem> books = new ArrayList<BookReportItem>();
+    	books = db.outBookReport(subject);
+    	Object[][] data = new Object[books.size()][7];
+    	System.out.println("book report on subject: " + subject + " found " + books.size() + " books."); //TODO: REMOVE DEBUG CODE
+    	for (int i = 0; i < books.size(); i++) {
+    		Object[] row = new Object[7];
+    		BookReportItem book = books.get(i);
+    		row[0] = book.callNumber;
+    		row[1] = book.copyNo;
+    		row[2] = book.title;
+    		row[3] = book.subject;
+    		row[4] = book.outDate;
+    		row[5] = book.dueDate;
+    		row[6] = book.overdue;
+    		data[i] = row;
+    	}
+    	return data;
+    }
 
 }
