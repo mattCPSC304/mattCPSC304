@@ -76,10 +76,11 @@ public class CheckAccountPanel extends JPanel implements ActionListener { //TODO
 		//add a button editor column to the table
 		buttonEditor = new ButtonEditor("pay fine", new DataAction() {
 			public Integer act(Object data) {
-				System.out.println("Paid fineid: "
-						+ data.toString());
-				Object[][] queryResults = Main.getDbAccess().getData("dummy");
-				fineDm.setDataVector(queryResults, fineColumnNames);
+				String bid = textField.getText();
+				System.out.println("Paid fineid: " + data.toString());
+				Main.getDbAccess().payFine(data.toString());
+				Object[][] fineResults = Main.getDbAccess().getFines(bid);
+				fineDm.setDataVector(fineResults, fineColumnNames);
 				Main.outputToConsole("fine id " + data.toString() + " paid.");
 				attachButtonEditorToFineTable();
 				return null;

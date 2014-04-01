@@ -303,7 +303,7 @@ public class Database {
 			// add the secondary authors
 			System.out.println("3");
 			for (int i = 0; i<secondaryAuthors.length; i++) {
-				// TODO: check for duplicate somehow
+				// TODO: check for duplicate somehow (esp against main author)
 				ps = con.prepareStatement("INSERT INTO HASAUTHOR VALUES (?,?)");
 				ps.setString(1, callNumber);
 				ps.setString(2, secondaryAuthors[i]);
@@ -646,12 +646,15 @@ public class Database {
 			}
 			callNumber = rs.getString("callNumber");
 			copyNo = rs.getString("copyNo");
+			Date outdate = rs.getDate("outDate"); //TODO: REMOVE DEBUG STATEMENT
+			Date indate = rs.getDate("inDate"); //TODO: REMOVE DEBUG STATEMENT
 			displayMessage("process return associates callnumber " + callNumber + " and copyNo " + copyNo + " with this borid."); //TODO: REMOVE DEBUG PRINTLN
+			displayMessage("process return found outdate, indate: " + outdate + indate + "and updated indate to" + now); //TODO: REMOVE DEBUG PRINTLN
 			// set inDate = now
 			ps = con.prepareStatement("UPDATE BORROWING SET inDate=? WHERE borid=?");
 			ps.setDate(1, now);
 			ps.setInt(2, borid);
-			//ps.executeUpdate();
+			ps.executeUpdate();
 			displayMessage("process return updated this borrowing's date with " + now.toString()); //TODO: REMOVE DEBUG PRINTLN
 			// set BOOKCOPY.status="in"
 			ps = con.prepareStatement("UPDATE BOOKCOPY SET status='in' WHERE callNumber=? AND copyNo=?");
@@ -810,7 +813,6 @@ public class Database {
 		return books;
 	}
 
-	//TODO: BROKEN
 	public List<Fine> getFines(int bid) {
 		Statement stmt;
 		ResultSet rs;
@@ -819,15 +821,13 @@ public class Database {
 			stmt = con.createStatement();
 			rs = stmt.executeQuery("SELECT * FROM FINE,BORROWING WHERE FINE.BORID=BORROWING.BORID AND FINE.PAIDDATE <= to_date('19710101','YYYYMMDD') AND BORROWING.BID=" + bid); //this filters only unpaid fines by finding fines where paid date was set to the default ~1970 value
 			while (rs.next()) {
-				if (rs.getDate("paidDate") == new Date(0)) {
-					Fine fine = new Fine();
-					fine.fid = rs.getInt("fid");
-					fine.amount = rs.getString("amount");
-					fine.issuedDate = rs.getDate("issuedDate");
-					fine.paidDate = rs.getDate("paidDate");
-					fine.borid = rs.getInt("borid");
-					fines.add(fine);
-				}
+				Fine fine = new Fine();
+				fine.fid = rs.getInt("fid");
+				fine.amount = rs.getString("amount");
+				fine.issuedDate = rs.getDate("issuedDate");
+				fine.paidDate = rs.getDate("paidDate");
+				fine.borid = rs.getInt("borid");
+				fines.add(fine);
 			}
 			stmt.close();
 			rs.close();
@@ -837,44 +837,27 @@ public class Database {
 		return fines;
 	}
 	
-	//TODO: BROKEN
-	public List<BorrowedBook> getBorrowedBooks(int bid) { // TODO: borrowed books that haven't been returned (something about overdue not implemented right?)
+	public List<BorrowedBook> getBorrowedBooks(int bid) {
 		Statement stmt;
 		ResultSet rs;
-		Statement stmt1;
-		ResultSet rs1;
 		List<BorrowedBook> books = new ArrayList<BorrowedBook>();
 		try {
 			stmt = con.createStatement();
-			stmt1 = con.createStatement();
 			//get borrowed books for borrower
-			rs = stmt.executeQuery("SELECT * FROM BORROWING WHERE bid=" + bid);
-			// This line is only needed to initialize rs1 to close it
-			rs1 = stmt.executeQuery("SELECT * FROM BORROWING WHERE bid=" + bid);
+			rs = stmt.executeQuery("SELECT * FROM BOOK,BORROWING WHERE BOOK.CALLNUMBER=BORROWING.CALLNUMBER AND BORROWING.INDATE <= to_date('19710101','YYYYMMDD') AND BORROWING.BID=" + bid);
 			while (rs.next()) {
-				if (rs.getDate("inDate") == new Date(0)) {
-					BorrowedBook book = new BorrowedBook();
-					String callNumber = rs.getString("callNumber");
-					rs1 = stmt1
-							.executeQuery("SELECT * FROM BOOK WHERE callNumber="
-									+ callNumber);
-					rs1.next();
-					book.callNumber = rs1.getString("callNumber");
-					book.isbn = rs1.getString("isbn");
-					book.mainAuthor = rs1.getString("mainAuthor");
-					book.publisher = rs1.getString("publisher");
-					book.title = rs1.getString("title");
-					book.year = rs1.getString("year");
-					book.borid = rs.getInt("borid");
-					book.copyNo = rs.getString("copyNo");
-					book.bid = bid;
-					books.add(book);
-				}
+				BorrowedBook book = new BorrowedBook();
+				book.callNumber = rs.getString("callNumber");
+				book.isbn = rs.getString("isbn");
+				book.mainAuthor = rs.getString("mainAuthor");
+				book.publisher = rs.getString("publisher");
+				book.title = rs.getString("title");
+				book.year = rs.getString("year");
+				book.bid = bid;
+				books.add(book);
 			}
 			stmt.close();
-			stmt1.close();
 			rs.close();
-			rs1.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -932,32 +915,23 @@ public class Database {
 		return holdRequest;
 	}
 
-	public Fine payFine(int fid) {
-		Fine fine = new Fine();
+	public void payFine(int fid) {
 		Statement stmt;
 		PreparedStatement ps;
-		ResultSet rs;
+		java.util.Date javaDate = new java.util.Date();
+		Date now = new Date(javaDate.getTime());
 		try {
 			stmt = con.createStatement();
 			ps = con.prepareStatement("UPDATE FINE SET paidDate = ? WHERE fid = ? ");
-			java.util.Date javaDate = new java.util.Date();
-			Date now = new Date(javaDate.getTime());
 			ps.setDate(1, now);
 			ps.setInt(2, fid);
-			rs = stmt.executeQuery("SELECT * FROM FINE WHERE fid = " + String.valueOf(fid));
-			rs.next();
-			fine.fid = fid;
-			fine.amount = rs.getString("amount");
-			fine.issuedDate = rs.getDate("issuedDate");
-			fine.paidDate = rs.getDate("paidDate");
-			fine.borid = rs.getInt("borid");
+			ps.execute();
 			con.commit();
 			stmt.close();
 			ps.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return fine;
 	}
 
 	// AddNewBook - > See InsertBook

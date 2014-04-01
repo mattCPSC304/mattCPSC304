@@ -96,6 +96,10 @@ public class DatabaseAccess {
     	return data;
     }
 	
+	public void payFine(String fid) {
+		db.payFine(Integer.parseInt(fid));
+	}
+	
 	public Object[][] getFines(String bid) {
 		List<Fine> fines = new ArrayList<Fine>();
 		fines = db.getFines(Integer.parseInt(bid));
@@ -114,6 +118,7 @@ public class DatabaseAccess {
 	public Object[][] getCheckedOut(String bid) {
 		List<BorrowedBook> books = new ArrayList<BorrowedBook>();
 		books = db.getBorrowedBooks(Integer.parseInt(bid));
+		System.out.println("checking " + bid + "'s borrowed books. # found: " + books.size()); //TODO: REMOVE DEBUG CODE
 		Object[][]data = new Object[books.size()][6];
 		for (int i = 0; i < books.size(); i++) {
     		Object[] row = new Object[4];
