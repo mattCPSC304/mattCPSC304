@@ -827,12 +827,13 @@ public class Database {
 		ResultSet rs;
 		PreparedStatement ps;
 		try {
-			ps = con.prepareStatement("INSERT INTO HOLDREQUEST VALUES (hid_counter.nextval,?,?,?) RETURNING hid");
+			ps = con.prepareStatement("INSERT INTO HOLDREQUEST VALUES (hid_counter.nextval,?,?,?)",new String[]{"hid"});
 			ps.setInt(1, bid);
 			ps.setString(2, callNumber);
 			ps.setDate(3, issuedDate);
 			ps.executeUpdate();
 			rs = ps.getResultSet();
+			rs = ps.getGeneratedKeys();
 			rs.next();
 			holdRequest.hid = rs.getInt(1);
 			holdRequest.bid = bid;

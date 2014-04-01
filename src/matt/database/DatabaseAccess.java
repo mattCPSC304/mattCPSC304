@@ -1,5 +1,6 @@
 package matt.database;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,6 +90,11 @@ public class DatabaseAccess {
     	}
     	return data;
     }
+	
+	public void holdRequest(String bid, String callNumber, Date issuedDate) {
+		db.placeHoldRequest((int) Integer.parseInt(bid), callNumber, issuedDate);
+		System.out.println("hold request placed for borrower" + bid + " on book " + callNumber);
+	}
 	
 	public void addBook(String callNumber, String isbn, String title,
 			String mainAuthor, String publisher, String year) { // a simple addition of a book by fields
